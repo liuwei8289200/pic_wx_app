@@ -1,6 +1,6 @@
 {
   "pages": [
-    "pages/home/home",
+    "pages/index/index",
     "pages/message/message",
     "pages/contact/contact"
   ],
@@ -11,7 +11,7 @@
   },
   "tabBar": {
     "list": [{
-      "pagePath": "pages/home/home",
+      "pagePath": "pages/index/index",
       "text": "首页",
       "iconPath": "/images/tabs/home.png",
       "selectedIconPath": "/images/tabs/home-active.png"

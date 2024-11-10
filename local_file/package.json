@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@cloudbase/js-sdk": "^2.7.5-beta.0",
+    "@cloudbase/manager-node": "^4.2.9"
+  }
+}

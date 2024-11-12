@@ -1,7 +1,10 @@
 // 云函数入口文件
 const cloud = require('wx-server-sdk')
 
-cloud.init() // 使用当前云环境
+cloud.init({
+  
+  env: 'mini-program-8gte1ziw1d4ac40c'
+}) // 使用当前云环境
 const CloudBase = require("@cloudbase/manager-node");
 const {storage} = new CloudBase();
 

@@ -1,0 +1,7 @@
+
+<view class="box">
+  <button type="primary" bindtap="go" data-url="/address-book/index">吸顶布局1</button>
+  <button type="primary" bindtap="go" data-url="/push-pinned-header/index">吸顶布局2</button>
+  <button type="primary" bindtap="go" data-url="/index/index">瀑布流布局</button>
+  <button type="primary" bindtap="go" data-url="/aligned/index">网格布局</button>
+</view>

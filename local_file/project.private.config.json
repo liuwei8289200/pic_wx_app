@@ -3,7 +3,8 @@
   "projectname": "local_file",
   "setting": {
     "compileHotReLoad": true,
-    "urlCheck": false
+    "urlCheck": false,
+    "skylineRenderEnable": true
   },
-  "libVersion": "3.3.3"
+  "libVersion": "3.6.4"
 }

@@ -1,0 +1,57 @@
+<scroll-view
+  type="custom"
+  scroll-y
+  show-scrollbar="{{false}}"
+  scroll-into-view="{{intoView}}"
+  class="scroll-view"
+  bindscrolltolower="bindscrolltolower"
+  style="margin-top: {{menuTop}}px;"
+>
+  <sticky-section push-pinned-header="{{false}}">
+    <sticky-header>
+      <view class="sticky-header">
+        <view class="search" style="height: {{menuHeight}}px;line-height: {{menuHeight}}px; margin-right: {{menuLeft}}px;">
+          <input placeholder="找找去哪儿玩～" />
+        </view>
+      </view>
+    </sticky-header>
+    <grid-view type="aligned" cross-axis-count="5">
+      <view wx:for="{{list1}}" class="list1">
+        <image src="https://res.wx.qq.com/op_res/omjFJjgEk_ZZIDmlSIE1hpn57hHOlcHvbMy1jM-BwNFczaS8S_rFryt8b3c7VC4h0BUjX4bSyjoDNaPteTlYcw" mode="aspectFill"></image>
+        <text>广州</text>
+      </view>
+    </grid-view>
+  </sticky-section>
+
+  <sticky-section push-pinned-header="{{false}}">
+    <sticky-header>
+      <view class="sticky-header">
+        <view class="list2-head">
+          <view class="mini-head current">自然风景</view>
+          <view class="mini-head">周边旅游</view>
+          <view class="mini-head">温泉</view>
+          <view class="mini-head">玩雪</view>
+          <view class="mini-head">海边</view>
+        </view>
+      </view>
+    </sticky-header>
+    <grid-view type="masonry" cross-axis-count="{{crossAxisCount}}" cross-axis-gap="{{crossAxisGap}}" main-axis-gap="{{mainAxisGap}}">
+      <view wx:for="{{list}}" class="grid-box">
+        <image src="{{item.image_url}}" mode="widthFix" binderror="binderror"></image>
+        <view class="content-box">
+          <text>这里的风景好美～</text>
+          <view class="profile-text">
+            <view class="left">
+              <image class="icon" src="https://res.wx.qq.com/op_res/lS41C5Xp6y6mfUbelCW8PArEcMwWRuhSohPO46vAiELbhAf56_CwONEDgM2vIVxOlT5KDcSxCkV8xIJ6cg3x2Q"></image>
+              <text>binnie</text>
+            </view>
+            <view class="right">
+              <image class="icon-collection" src="https://res.wx.qq.com/community/dist/community/images/disagree_icon_fab2b7.svg"></image>
+              <text>666</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </grid-view>
+  </sticky-section>
+</scroll-view>

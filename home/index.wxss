@@ -1,0 +1,8 @@
+/* home/index.wxss */
+.box {
+  margin-top: 100px;
+}
+
+button {
+  margin-bottom: 40px;
+}

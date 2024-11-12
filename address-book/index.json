@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "navigation-bar": "../components/navigation-bar/index",
+    "address-book": "../components/address-book/index"
+  },
+  "disableScroll": true,
+  "navigationStyle": "custom"
+}

@@ -1,0 +1,31 @@
+<!--pages/index/index.wxml-->
+<view class="top-bar">
+  <input class="search" placeholder="搜索"/>
+  <view class="logo">Logo</view>
+  <button class="help">帮助</button>
+</view>
+
+<swiper class="swiper" autoplay="true" interval="3000" indicator-dots="true" indicator-active-color="#4682b4">
+  <block wx:for="{{swiperImages}}" wx:key="*this">
+    <!---
+      <swiper-item>
+      <view class="slide-container">
+        <image src="{{item.item1}}" class="slide-image"/>
+        <image src="{{item.item2}}" class="slide-image"/>
+      </view>
+    </swiper-item>
+    --->
+    <swiper-item wx:if="{{index % 2 === 0}}">
+      <view class="slide-container">
+        <image src="{{item}}" class="slide-image"/>
+        <image src="{{swiperImages[index + 1]}}" class="slide-image"/>
+      </view>
+    </swiper-item>
+  </block>
+</swiper>
+
+<scroll-view class="waterfall" scroll-y="true" bindscrolltolower="loadMoreImages">
+  <block wx:for="{{imageList}}" wx:key="*this">
+    <image src="{{item}}" class="waterfall-image" bindtap="viewImageDetail"/>
+  </block>
+</scroll-view> 

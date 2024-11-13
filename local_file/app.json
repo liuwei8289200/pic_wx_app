@@ -4,12 +4,18 @@
     "pages/message/message",
     "pages/contact/contact"
   ],
-  "window": {
-    "navigationBarTextStyle": "white",
-    "navigationBarTitleText": "图片生成",
-    "navigationBarBackgroundColor": "#2b4b6b"
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle":"black"
   },
   "tabBar": {
+    "custom": true,
+    "color": "#7A7E83",
+    "selectedColor": "#3cc51f",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
     "list": [{
       "pagePath": "pages/index/index",
       "text": "首页",
@@ -33,5 +39,13 @@
   "style": "v2",
   "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "renderer": "skyline",
+  "rendererOptions": { 
+      "skyline": { 
+        "defaultDisplayBlock": true,
+        "defaultContentBox": true,
+        "disableABTest": true
+        } 
+    }
 }

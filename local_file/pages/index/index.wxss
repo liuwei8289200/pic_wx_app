@@ -6,6 +6,7 @@
   background-color: #f0f8ff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 20rpx; /* 添加 margin-top */
 }
 
 .search, .logo, .help {
@@ -22,7 +23,7 @@
   transition: all 0.3s ease;
 }
 
-.search:focus {
+.search-focused {
   border-color: #4682b4;
   box-shadow: 0 0 5px #4682b4;
 }
@@ -38,11 +39,10 @@
   background-color: #87ceeb;
   border: none;
   color: white;
-  cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.help:hover {
+.help-active {
   background-color: #4682b4;
 }
 
@@ -59,22 +59,6 @@
   width: 100%;
   height: 100%;
 }
-
-.slide-image {
-  width: 45%; /* 每张图片占45%宽度 */
-  height: 100%; /* 保持图片比例 */
-  object-fit: cover;
-}
-
-.waterfall {
-  height: calc(100vh - 400px); /* Adjust based on your layout */
-}
-
-.waterfall-image {
-  width: 100%;
-  margin-bottom: 10px;
-} 
-
 scroll-view {
   background-color: #f5f5f5;
   margin-top: 46px;
@@ -144,3 +128,22 @@ scroll-view {
   color: rgba(0,0,0,.5);
   margin: 0 3px;
 }
+
+.cnt {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .album {
+    height: 0;
+    flex: 1;
+    margin-bottom: 12px;
+  }
+  
+  .safe-area-inset-bottom {
+    height: env(safe-area-inset-bottom, 10px);
+  }

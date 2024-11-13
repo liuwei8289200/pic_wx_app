@@ -1,5 +1,6 @@
 
 import { getHeightImages } from '../../utils/image'
+import { getAlbum } from '../../utils/store'
 
 const descList = [
     '这里风景好美～',
@@ -15,22 +16,22 @@ Page({
     crossAxisCount: 3,
     crossAxisGap: 8,
     mainAxisGap: 8,
+    imageWidth: 0,
+    imageMargin: 12, // 图片间距
+    lineLimit: 3, // 每行多少张图片
+    list: [],
   },
   onLoad() {
     this.loadSwiperImages();
-    this.loadWaterfallImages();
     this.setData({
       list: this.data.list.concat(getnewList())
     })
-  },
-  loadWaterfallImages() {
-    // const { page, pageSize, imageList } = this.data;
-    // // 模拟从 CloudBase 加载图片
-    // const newImages = Array.from({ length: pageSize }, (_, i) => `/images/waterfall/image${page * pageSize + i + 1}.jpg`);
-    // this.setData({
-    //   imageList: imageList.concat(newImages),
-    //   page: page + 1
-    // });
+    const { imageMargin, lineLimit } = this.data
+    const { screenWidth } = wx.getSystemInfoSync()
+    this.setData({
+      imageWidth: (screenWidth - imageMargin * 4) / lineLimit, // 图片宽度
+      list: getAlbum(),
+    })
   },
   loadSwiperImages() {
     wx.cloud.callFunction({
@@ -96,5 +97,6 @@ function getnewList() {
       image_url: imgUrlList[(count++) % imgUrlList.length] || 'http://mmbiz.qpic.cn/sz_mmbiz_jpg/GEWVeJPFkSEV5QjxLDJaL6ibHLSZ02TIcve0ocPXrdTVqGGbqAmh5Mw9V7504dlEiatSvnyibibHCrVQO2GEYsJicPA/0?wx_fmt=jpeg',
     }
   }
+  console.log("newList is", newList);
   return newList
 }

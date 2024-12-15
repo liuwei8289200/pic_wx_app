@@ -5,14 +5,14 @@ Component({
     selectedColor: "#3cc51f",
     list: [{
       pagePath: "/pages/index/index",
-      iconPath: "/images/tabs/home.png",
-      selectedIconPath: "/images/tabs/home-active.png",
+      iconPath: "/images/icon_component.png",
+      selectedIconPath: "/images/icon_component_HL.png",
       text: "首页"
     }, {
       pagePath: "/pages/contact/contact",
-      iconPath: "/images/tabs/contact.png",
-      selectedIconPath: "/images/tabs/contact-active.png",
-      text: "我的"
+      iconPath: "/images/icon_API.png",
+      selectedIconPath: "/images/icon_API_HL.png",
+      text: "联系"
     }]
   },
   attached() {

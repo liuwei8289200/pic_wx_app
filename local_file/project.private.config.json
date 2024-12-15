@@ -4,7 +4,7 @@
   "setting": {
     "compileHotReLoad": true,
     "urlCheck": false,
-    "skylineRenderEnable": true
+    "skylineRenderEnable": false
   },
   "libVersion": "3.6.4"
 }

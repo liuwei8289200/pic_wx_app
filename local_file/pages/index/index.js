@@ -33,6 +33,12 @@ Page({
       list: getAlbum(),
     })
   },
+  onShow() {
+    setTimeout(() => {
+      console.log(213213213131311232131231)
+      this.getAlbumHeight();
+    }, 1000);
+  },
   loadSwiperImages() {
     wx.cloud.callFunction({
       name: 'getFiles',
@@ -79,6 +85,13 @@ Page({
     wx.navigateTo({
       url: `/pages/detail/detail?imageUrl=${imageUrl}`
     });
+  },
+  getAlbumHeight() {
+    wx.createSelectorQuery().select(".tab-bar").boundingClientRect(function (rect) {
+      console.log('asdsad', rect)
+    }).exec((res) => {
+      console.log(res)
+    })
   }
 });
 function getnewList() {

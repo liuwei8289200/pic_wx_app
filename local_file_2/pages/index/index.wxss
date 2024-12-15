@@ -1,4 +1,4 @@
-.top-bar {
+/* .top-bar {
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -6,6 +6,29 @@
   background-color: #f0f8ff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+} */
+
+
+.top-bar {
+  height: 50px; /* 默认高度 */
+}
+
+@media (max-height: 600px) {
+  .top-bar {
+    height: 40px; /* 针对小屏幕设备的高度 */
+  }
+}
+
+@media (min-height: 601px) and (max-height: 800px) {
+  .top-bar {
+    height: 60px; /* 针对中等屏幕设备的高度 */
+  }
+}
+
+@media (min-height: 801px) {
+  .top-bar {
+    height: 70px; /* 针对大屏幕设备的高度 */
+  }
 }
 
 .search, .logo, .help {

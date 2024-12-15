@@ -1,4 +1,7 @@
 <!--pages/index/index.wxml-->
+<share-element key="navigation-bar">
+    <navigation-bar title="相册图片预览" back></navigation-bar>
+  </share-element>
 <view class="top-bar">
   <input class="search" placeholder="搜索"/>
   <view class="logo">Logo</view>

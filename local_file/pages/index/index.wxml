@@ -41,5 +41,4 @@
     imageMargin="{{imageMargin}}"
     lineLimit="{{lineLimit}}"
   ></album>
-<view class="safe-area-inset-bottom"></view>
 </view>

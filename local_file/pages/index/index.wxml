@@ -33,6 +33,7 @@
     </view>
   </grid-view>
 </scroll-view> -->
+<view class="cnt">
 <album
     class="album"
     list="{{list}}"
@@ -41,3 +42,4 @@
     lineLimit="{{lineLimit}}"
   ></album>
 <view class="safe-area-inset-bottom"></view>
+</view>

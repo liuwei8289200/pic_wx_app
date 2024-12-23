@@ -22,8 +22,9 @@
           width="{{imageWidth}}"
           height="{{imageWidth}}"
           data-index="{{item.index}}"
-          bindtap="onTapImage"
+          bindtap="goToDetail"
         ></album-image>
       </view>
     </view>
   </scroll-view>
+  <!--  //bindtap="onTapImage" -->

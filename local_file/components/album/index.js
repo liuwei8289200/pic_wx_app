@@ -101,5 +101,16 @@ Component({
         routeType: 'fadeToggle',
       })
     },
+    goToDetail(evt) {
+      console.log("test111111111111")
+      console.log(evt.currentTarget)
+      console.log(evt.currentTarget.dataset)
+      const imageUrl = evt.currentTarget.dataset.imageUrl; // 获取点击的图片 URL
+      console.log("imageUrl is", imageUrl)
+      wx.navigateTo({
+        url: `/pages/detail/detail?imageUrl=${imageUrl}` // 跳转到详情页
+      });
+    },
+
   },
 })

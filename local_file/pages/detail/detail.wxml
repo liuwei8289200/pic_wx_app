@@ -1,0 +1,13 @@
+<view class="detail-container">
+    <image src="{{imageUrl}}" class="detail-image" />
+    <button bindtap="like">点赞</button>
+    <view class="comments">
+        <input placeholder="添加评论" bindinput="onCommentInput" />
+        <button bindtap="submitComment">提交评论</button>
+    </view>
+    <view class="comment-list">
+        <block wx:for="{{comments}}" wx:key="*this">
+            <text>{{item}}</text>
+        </block>
+    </view>
+</view>

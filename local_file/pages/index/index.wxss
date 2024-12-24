@@ -1,3 +1,9 @@
+page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+ 
  .top-bar {
   display: flex;
   align-items: center;
@@ -26,7 +32,6 @@
   border-color: #4682b4;
   box-shadow: 0 0 5px #4682b4;
 }
-
 .logo {
   font-weight: bold;
   color: #4682b4;
@@ -59,8 +64,11 @@
   height: 100%;
 }
 scroll-view {
-  background-color: #f5f5f5;
-  margin-top: 46px;
+  background-color: #f4f4f4;
+}
+
+view, scroll-view, page, image {
+  box-sizing: border-box;
 }
 .grid-box {
   width: 33vw;
@@ -76,57 +84,6 @@ scroll-view {
   width: 100%;
 }
 
-.look {
-  position: absolute;
-  width: 100%;
-  height: 20px;
-  line-height: 20px;
-  background-color: rgba(0,0,0,.3);
-  border-radius: 4px 4px 0 0;
-  text-align: right;
-  color: #fff;
-  padding-right: 10px;
-  right: 0;
-  bottom: 0;
-  font-size: 12px;
-}
-
-.content-box {
-  padding-top: 10px;
-}
-
-.profile-text {
-  display: flex;
-  flex-direction: row;
-  padding-top: 4px;
-  align-self: flex-end;
-}
-
-.profile-text view {
-  display: flex;
-  color: #888;
-  font-size: 14px;
-}
-
-.left {
-  width: 70%;
-}
-.right {
-  /* width: 30%; */
-  text-align: right;
-  flex-direction: row;
-  color: #888;
-  font-size: 14px;
-}
-
-.right .icon-collection {
-  width: 16px;
-  height: 16px;
-  background-size: cover;
-  opacity: .5;
-  color: rgba(0,0,0,.5);
-  margin: 0 3px;
-}
 
 .cnt {
     top: 0;
@@ -134,14 +91,14 @@ scroll-view {
     height: 50%;
     display: flex;
     flex-direction: column;
-  }
+}
   
-  .album {
+.album {
     height: 0;
     flex: 1;
     margin-bottom: 12px;
-  }
+}
   
-  .safe-area-inset-bottom {
+.safe-area-inset-bottom {
     height: env(safe-area-inset-bottom, 50px);
-  }
+}

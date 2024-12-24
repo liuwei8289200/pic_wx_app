@@ -1,7 +1,5 @@
 <!--pages/index/index.wxml-->
-<share-element key="navigation-bar">
-    <navigation-bar title="相册图片预览" back></navigation-bar>
-  </share-element>
+<navigation-bar back title="图片浏览"></navigation-bar>
 <view class="top-bar">
   <input class="search" placeholder="搜索"/>
   <view class="logo">Logo</view>
@@ -33,7 +31,7 @@
     </view>
   </grid-view>
 </scroll-view> -->
-<view class="cnt">
+<!-- <view class="cnt">
 <album
     class="album"
     list="{{list}}"
@@ -41,4 +39,22 @@
     imageMargin="{{imageMargin}}"
     lineLimit="{{lineLimit}}"
   ></album>
-</view>
+</view> -->
+<scroll-view
+ scroll-y
+ style="flex: 1; width: 100%; overflow: hidden; padding: {{padding}}px; padding-bottom: 0;"
+ type="custom"
+ show-scrollbar="{{false}}"
+>
+  <grid-view
+    type="masonry"
+  >
+    <card
+      wx:for="{{gridList}}"
+      wx:key="id"
+      card-width="{{cardWidth}}"
+      index="{{index}}"
+      item="{{item}}"
+    />
+  </grid-view>
+</scroll-view>

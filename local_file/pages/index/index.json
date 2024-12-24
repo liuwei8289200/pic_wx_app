@@ -1,7 +1,8 @@
 {
   "usingComponents": {
     "navigation-bar": "../../components/navigation-bar/index",
-    "album": "../../components/album/index"
+    "album": "../../components/album/index",
+    "card": "../../components/card/card"
   },
   "disableScroll": true,
   "navigationStyle": "custom"

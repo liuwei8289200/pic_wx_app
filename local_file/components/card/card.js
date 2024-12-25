@@ -93,11 +93,11 @@ Component({
     navigateTo(e) {
       const { index, url, content, ratio, nickname } = e.currentTarget.dataset
       console.log("test111111", e.currentTarget.dataset)
-      const urlContent = `../../pages/detail/detail?index=${index}&url=${encodeURIComponent(url)}&content=${content}&ratio=${ratio}&nickname=${nickname}`
+      const urlContent = `../../pages/detail/detail?index=${index}&url=${url}&content=${content}&ratio=${ratio}&nickname=${nickname}`
       console.log("test22222222", urlContent)
       wx.navigateTo({
         url: urlContent,
-        routeType: 'CardScaleTransition',
+        //routeType: 'CardScaleTransition',
       })
     },
     handleFrame(data) {

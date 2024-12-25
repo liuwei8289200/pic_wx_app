@@ -3,7 +3,24 @@ page {
   flex-direction: column;
   height: 100vh;
 }
- 
+scroll-view {
+    background-color: #f4f4f4;
+  }
+.swiper {
+    width: 100%;
+    height: 30vh;
+    overflow: hidden;
+}
+.slide-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+view, scroll-view, page, image {
+    box-sizing: border-box;
+}
  .top-bar {
   display: flex;
   align-items: center;
@@ -22,68 +39,6 @@ page {
   border-radius: 5px;
   font-size: 16px;
 }
-
-.search {
-  border: 2px solid #87ceeb;
-  transition: all 0.3s ease;
-}
-
-.search-focused {
-  border-color: #4682b4;
-  box-shadow: 0 0 5px #4682b4;
-}
-.logo {
-  font-weight: bold;
-  color: #4682b4;
-  text-shadow: 1px 1px 2px #87ceeb;
-  background-color: #f0f8ff;
-}
-
-.help {
-  background-color: #87ceeb;
-  border: none;
-  color: white;
-  transition: background-color 0.3s ease;
-}
-
-.help-active {
-  background-color: #4682b4;
-}
-
-.swiper {
-  width: 100%;
-  height: 30vh;
-  overflow: hidden;
-}
-
-.slide-container {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-}
-scroll-view {
-  background-color: #f4f4f4;
-}
-
-view, scroll-view, page, image {
-  box-sizing: border-box;
-}
-.grid-box {
-  width: 33vw;
-  height: 44vw;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: #fff;
-  justify-content: space-around;
-  position: relative;
-}
-
-.grid-box image {
-  width: 100%;
-}
-
 
 .cnt {
     top: 0;

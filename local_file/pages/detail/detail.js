@@ -1,5 +1,5 @@
-import { Curves, CurveAnimation, lerp } from '../list/route'
-import { clamp } from '../list/utils'
+import { Curves, CurveAnimation, lerp } from '../index/route'
+import { clamp } from '../index/utils'
 
 const { screenWidth } = wx.getSystemInfoSync()
 const { shared, timing, Easing } = wx.worklet
@@ -65,6 +65,8 @@ Component({
         shareEleTop
       } = this.customRouteContext || {}
 
+      console.log("test11111111", this.customRouteContext)
+      console.log("test22222222", this.swiperHeight)
       // 根据进入或返回使用不同曲线换算到的值
       const _curvePrimaryAnimation = CurveAnimation({
         animation: primaryAnimation,

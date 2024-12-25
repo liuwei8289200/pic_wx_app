@@ -4,7 +4,27 @@
   "setting": {
     "compileHotReLoad": true,
     "urlCheck": false,
-    "skylineRenderEnable": false
+    "skylineRenderEnable": true
   },
-  "libVersion": "3.6.4"
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "",
+          "pathName": "detail/detail",
+          "query": "index=1&url=https%3A%2F%2Fpicsum.photos%2F300%2F400%3Frandom%3D1&content=Hayya Hayya！我来小红书啦&ratio=0.75",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "list/list",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        }
+      ]
+    }
+  },
+  "libVersion": "latest"
 }

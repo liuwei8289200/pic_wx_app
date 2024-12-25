@@ -142,6 +142,7 @@ const ScaleTransitionRouteBuilder = (routeContext) => {
 
 let hasInstalled = false
 export function installRouteBuilder() {
+  console.log("test1111111111 installRouteBuild", hasInstalled)
   if (hasInstalled) {
     return
   }

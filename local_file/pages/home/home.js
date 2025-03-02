@@ -5,19 +5,28 @@ Page({
    * 页面的初始数据
    */
   data: {
-    //存放轮播图
-    swiperList :[]
+    userInfo: null, // 新增用户信息
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad(options) {
-
+    this.login();
   },
-
-  getSwiperList(){
-
+  login() {
+    wx.getUserProfile({
+      desc: '用于获取用户信息',
+      success: (res) => {
+        this.setData({
+          userInfo: res.userInfo // 存储用户信息
+        });
+        console.log('用户信息:', this.data.userInfo);
+      },
+      fail: (err) => {
+        console.error('获取用户信息失败:', err);
+      }
+    });
   },
 
   /**

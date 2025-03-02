@@ -60,7 +60,7 @@ Component({
           console.log("test1111111", res.result.data);
           //获取到size>0的后,并将其中的Key值存入数组
           //将数组中的文件名改为cloud://6d69-mini-program-8gte1ziw1d4ac40c-1258427370/swiper_images/1.png
-          const pngFiles = res.result.data.filter(file => file.Size > 0 ).map(file => `cloud:/mini-program-7gugok6cdb014aba.6d69-mini-program-7gugok6cdb014aba-1258427370/${file.Key}`);
+          const pngFiles = res.result.data.filter(file => file.Size > 0 ).map(file => `cloud://mini-program-7gugok6cdb014aba.6d69-mini-program-7gugok6cdb014aba-1258427370/${file.Key}`);
           console.log(pngFiles);
           wx.cloud.getTempFileURL({
             fileList: pngFiles,

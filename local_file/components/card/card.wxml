@@ -7,8 +7,9 @@
 				<view class="card_desc" style="color: #000;">
 					<view class="card_content">{{item.content}}</view>
 					<view class="card_footer">
-						<image class="card_avatar" src="https://res.wx.qq.com/op_res/BqgN85sXxTbk1kynEEihrwQPXmcn86nOyioRnPAfkrbZteUWsKfEpgoYZ1pk-3TMTc_qXFSElIgkvILR-zzh1Q" />
-						<text class="card_nickname">{{item.nickname}}</text>
+						<!-- <image class="card_avatar" src="https://res.wx.qq.com/op_res/BqgN85sXxTbk1kynEEihrwQPXmcn86nOyioRnPAfkrbZteUWsKfEpgoYZ1pk-3TMTc_qXFSElIgkvILR-zzh1Q" /> -->
+						<!---><text class="card_nickname">{{item.nickname}}</text><--->
+						<image class="card_avatar" src="icons/like.png" bindtap="likeImage" data-url="{{item.image_url}}" />
 						<text class="card_like">{{item.like}}</text>
 					</view>
 				</view>

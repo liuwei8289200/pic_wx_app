@@ -6,13 +6,10 @@ Page({
       index: options.index,
       content: options.content,
       ratio: options.ratio,
-      nickname: options.nickname,
       swiperHeight: screenWidth / options.ratio,
       url: options.url,
-      imageList: [
-              'https://res.wx.qq.com/op_res/BqgN85sXxTbk1kynEEihr7lTnuuiwGJPwwjxDVYbDolj05sAxd5cOESVZt4_nl1KwzkiDWTvG56LuhE45xAaZA',
-              'https://res.wx.qq.com/op_res/Ak_VAL-nLvq6laAMVJA86rf3NAZ2vY86v757dfja16Z95xtoxk4BWWDuTCPT-pD1SjGGIddUsH0l6C8Yu5LJlw'
-            ]
+      short_title : options.short_title,
+      title: options.title
     });
   },
   

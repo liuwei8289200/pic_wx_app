@@ -56,6 +56,5 @@
       index="{{index}}"
       item="{{item}}"
     />
-    <button class="like-button" bindtap="likeImage" data-url="{{item.image_url}}">点赞</button>
   </grid-view>
 </scroll-view>

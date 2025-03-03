@@ -108,6 +108,47 @@ export const generateGridList = (childCount, columns) => {
   return ans
 }
 
+export const generateGridListNew = (childCount, columns) => {
+  return new Promise((resolve, reject) => { // 使用 Promise
+    const ans = [];
+    
+    wx.cloud.database().collection('grid_images_list').get({
+      success: function(res) {
+        console.log("res", res);
+        console.log("res.data", res.data);
+        
+        // 循环 res.data，将 data 中的 url 值存入 ans 中
+        res.data.forEach(item => {
+          //console.log("item", item);
+          const ratioIdx = Math.floor(Math.random() * imageRatio.length)
+          const ratio = imageRatio[ratioIdx]
+          // src 根据指定格式拼接
+          const url = `https://6d69-mini-program-7gugok6cdb014aba-1258427370.tcb.qcloud.la/grid_images/${item.file_id}`;
+          
+          //根据: 分割
+          const short_title = item.title.split('：')[0];
+          ans.push({
+            // id 是自增序号
+            id: ans.length,
+            ...ratio,
+            src: url,
+            like: item.like_num,
+            content: item.desc,
+            title: item.title,
+            short_title: short_title,
+          });
+          console.log("ans", ans);
+        });
+        
+        resolve(ans); // 数据获取完成后，返回 ans
+      },
+      fail: err => {
+        console.error('获取数据失败:', err);
+        reject(err); // 处理失败情况
+      }
+    });
+  });
+};
 
 export const clamp = function (cur, lowerBound, upperBound) {
   'worklet';

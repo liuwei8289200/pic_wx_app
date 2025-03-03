@@ -2,7 +2,7 @@
 import { getHeightImages } from '../../utils/image'
 import { getAlbum } from '../../utils/store'
 import { installRouteBuilder } from './route'
-import { generateGridList, compareVersion } from './utils'
+import { generateGridList, compareVersion, generateGridListNew } from './utils'
 
 const { screenWidth } = wx.getSystemInfoSync()
 const descList = [
@@ -25,13 +25,14 @@ Component({
     lineLimit: 3, // 每行多少张图片
     list: [],
 
+    gridList: [],
     padding: 4,
-    gridList: generateGridList(100, 2),
     cardWidth: (screenWidth - 4 * 2 - 4) / 2, // 减去间距
   },
   methods:{
     onLoad() {
       this.loadSwiperImages();
+      this.loadGridList();
       this.setData({
         list: this.data.list.concat(getnewList())
       })
@@ -44,7 +45,6 @@ Component({
     },
     onShow() {
       setTimeout(() => {
-        console.log(213213213131311232131231)
         this.getAlbumHeight();
       }, 1000);
     },
@@ -85,6 +85,16 @@ Component({
         }
       });
   
+    },
+    loadGridList() {
+      generateGridListNew(100, 2).then(ans => {
+        console.log("获取的图片列表:", ans);
+        this.setData({
+          gridList: ans // 将获取到的图片列表设置到组件的状态中
+        });
+      }).catch(err => {
+        console.error('获取图片列表失败:', err);
+      });
     },
     loadMoreImages() {
       this.loadWaterfallImages();

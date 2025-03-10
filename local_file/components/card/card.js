@@ -91,8 +91,8 @@ Component({
 
   methods: {
     likeImage(event) {
-      const imageUrl = event.currentTarget.dataset.url;
-      const fileId = 'cloud://mini-program-7gugok6cdb014aba.6d69-mini-program-7gugok6cdb014aba-1258427370/grid_images/1.png'
+      const { docid } = event.currentTarget.dataset
+      console.log("doc_id is", docid);
 
 
       // 更新点赞数字
@@ -100,8 +100,41 @@ Component({
       this.setData({
         'item.like': tmp_num // 立即更新点赞数
       });
-
+      wx.cloud.callFunction({
+        name: 'dbCommand',
+        data: {
+          action: 'updateLikeNum',
+          data: {
+            docid: docid,
+          }
+        },
+        success: res => {
+          console.log('云函数updateLikeNum调用成功：', res.result);
+        },
+        fail: err => {
+          console.error('云函数调用失败：', err);
+        }
+      });
+      // 获取openid
+      const openid = wx.getStorageSync('openId');
       // 异步写入数据库
+      wx.cloud.callFunction({
+        name: 'dbCommand',
+        data: {
+          action: 'updateLikeListByOpenId',
+          data: {
+            openid: openid,
+            docid: docid
+          }
+        },
+        success: res => {
+          console.log('云函数updateLikeListByOpenId调用成功：', res);
+        },
+        fail: err => {
+          console.error('云函数调用失败：', err);
+        }
+      });
+
       // wx.cloud.database().collection('likes').add({
       //   data: {
       //     imageUrl: imageUrl,
@@ -114,25 +147,25 @@ Component({
       //     console.error('点赞失败:', err);
       //   }
       // });
-      wx.cloud.database().collection('pic_list').get({
-        success: function(res) {
-          // res.data 是一个包含集合中有权限访问的所有记录的数据，不超过 20 条
-          console.log("res.data", res.data)
-        }
-      })
-      wx.cloud.database().collection('pic_list').doc('a56e23cd67c445520037fc6d7f232cb8').update({
-        // data 传入需要局部更新的数据
-        data: {
-          // 表示将 done 字段置为 true
-          like_num: tmp_num
-        },
-        success: res => {
-          console.log('点赞数更新成功:', res);
-        },
-        fail: err => {
-          console.error('点赞数更新失败:', err);
-        }
-      })
+      // wx.cloud.database().collection('pic_list').get({
+      //   success: function(res) {
+      //     // res.data 是一个包含集合中有权限访问的所有记录的数据，不超过 20 条
+      //     console.log("res.data", res.data)
+      //   }
+      // })
+      // wx.cloud.database().collection('pic_list').doc('a56e23cd67c445520037fc6d7f232cb8').update({
+      //   // data 传入需要局部更新的数据
+      //   data: {
+      //     // 表示将 done 字段置为 true
+      //     like_num: tmp_num
+      //   },
+      //   success: res => {
+      //     console.log('点赞数更新成功:', res);
+      //   },
+      //   fail: err => {
+      //     console.error('点赞数更新失败:', err);
+      //   }
+      // })
     },
     navigateTo(e) {
       const { index, url, content, ratio, title, short_title } = e.currentTarget.dataset

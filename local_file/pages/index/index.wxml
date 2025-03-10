@@ -17,34 +17,12 @@
   </block>
 </swiper>
 
-<!---
-<scroll-view class="waterfall" scroll-y="true" bindscrolltolower="loadMoreImages">
-  <block wx:for="{{imageList}}" wx:key="*this">
-    <image src="{{item}}" class="waterfall-image" bindtap="viewImageDetail"/>
-  </block>
-</scroll-view>
---->
-<!-- <scroll-view type="custom" scroll-y style="flex: 1; height: 100%; width: 100%">
-  <grid-view style="flex: 1;" type="aligned" cross-axis-count="{{crossAxisCount}}" cross-axis-gap="{{crossAxisGap}}" main-axis-gap="{{mainAxisGap}}">
-    <view wx:for="{{list}}" class="grid-box">
-      <image src="{{item.image_url}}" mode="aspectFit" binderror="binderror"></image>
-    </view>
-  </grid-view>
-</scroll-view> -->
-<!-- <view class="cnt">
-<album
-    class="album"
-    list="{{list}}"
-    imageWidth="{{imageWidth}}"
-    imageMargin="{{imageMargin}}"
-    lineLimit="{{lineLimit}}"
-  ></album>
-</view> -->
 <scroll-view
  scroll-y
  style="flex: 1; width: 100%; overflow: hidden; padding: {{padding}}px; padding-bottom: 0;"
  type="custom"
  show-scrollbar="{{false}}"
+ bindscrolltolower="loadMore"
 >
   <grid-view
     type="masonry"

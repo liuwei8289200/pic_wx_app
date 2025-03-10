@@ -130,6 +130,7 @@ export const generateGridListNew = (childCount, columns) => {
           ans.push({
             // id 是自增序号
             id: ans.length,
+            docid: item._id,
             ...ratio,
             src: url,
             like: item.like_num,
@@ -145,6 +146,27 @@ export const generateGridListNew = (childCount, columns) => {
       fail: err => {
         console.error('获取数据失败:', err);
         reject(err); // 处理失败情况
+      }
+    });
+  });
+};
+export const getPicListByDocidList = (docidList) => {
+  return new Promise((resolve, reject) => {
+    wx.cloud.callFunction({
+      name: 'dbCommand',
+      data: {
+        action: 'getPicListByDocidList',
+        data: {
+          docidList: docidList
+        }
+      },
+      success: res => {
+        console.log("res", res);
+        resolve(res.result);
+      },
+      fail: err => {
+        console.error('获取数据失败:', err);
+        reject(err);
       }
     });
   });

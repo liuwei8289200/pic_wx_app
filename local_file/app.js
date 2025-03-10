@@ -26,16 +26,18 @@ App({
     wx.cloud.callFunction({
       name: 'getOpenid',
       success: res => {
-        console.log("openId is ", res)
+        console.log("getOpenid is ", res)
+        wx.setStorageSync('openId', res.result.openid)
+        console.log("Storage openId is ", wx.getStorageSync('openId'))
       }
     })
-    // 登录
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-        console.log("test11111111", res.code)
-      }
-    })
+    // 登录（现在这个已经作废了）
+    // wx.login({
+    //   success: res => {
+    //     // 发送 res.code 到后台换取 openId, sessionKey, unionId
+    //     console.log("test11111111", res.code)
+    //   }
+    // })
   },
   // globalData: {
   //   userInfo: null,

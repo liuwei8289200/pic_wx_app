@@ -9,7 +9,7 @@
 					<view class="card_footer">
 						<!-- <image class="card_avatar" src="https://res.wx.qq.com/op_res/BqgN85sXxTbk1kynEEihrwQPXmcn86nOyioRnPAfkrbZteUWsKfEpgoYZ1pk-3TMTc_qXFSElIgkvILR-zzh1Q" /> -->
 						<!---><text class="card_nickname">{{item.nickname}}</text><--->
-						<image class="card_avatar" src="icons/like.png" bindtap="likeImage"/>
+						<image class="card_avatar" src="icons/like.png" bindtap="likeImage" data-docid="{{item.docid}}"/>
 						<text class="card_like">{{item.like}}</text>
 					</view>
 				</view>

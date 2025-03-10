@@ -1,8 +1,5 @@
-
-import { getHeightImages } from '../../utils/image'
-import { getAlbum } from '../../utils/store'
 import { installRouteBuilder } from './route'
-import { generateGridList, compareVersion, generateGridListNew } from './utils'
+import { compareVersion, generateGridListNew } from './utils'
 
 const { screenWidth } = wx.getSystemInfoSync()
 const descList = [
@@ -16,7 +13,6 @@ Component({
     imageList: [], // 瀑布流图片
     page: 0, // 当前页数
     pageSize: 20, // 每页加载图片数量
-    list: getnewList(),
     crossAxisCount: 3,
     crossAxisGap: 8,
     mainAxisGap: 8,
@@ -33,20 +29,13 @@ Component({
     onLoad() {
       this.loadSwiperImages();
       this.loadGridList();
-      this.setData({
-        list: this.data.list.concat(getnewList())
-      })
       const { imageMargin, lineLimit } = this.data
       const { screenWidth } = wx.getSystemInfoSync()
       this.setData({
         imageWidth: (screenWidth - imageMargin * 4) / lineLimit, // 图片宽度
-        list: getAlbum(),
       })
     },
     onShow() {
-      setTimeout(() => {
-        this.getAlbumHeight();
-      }, 1000);
     },
     loadSwiperImages() {
       wx.cloud.callFunction({
@@ -129,22 +118,3 @@ Component({
     },
   },
 });
-function getnewList() {
-  const newList = new Array(20).fill(0)
-  const imgUrlList = getHeightImages()
-  console.log("imgUrlList", imgUrlList);
-  console.log("descList", descList);
-  let count = 0
-  for (let i = 0; i < newList.length; i++) {
-    newList[i] = {
-      idx: i,
-      title: `scroll-view`,
-      desc: descList[count%2],
-      time: `19:20`,
-      like: 88,
-      image_url: imgUrlList[(count++) % imgUrlList.length] || 'http://mmbiz.qpic.cn/sz_mmbiz_jpg/GEWVeJPFkSEV5QjxLDJaL6ibHLSZ02TIcve0ocPXrdTVqGGbqAmh5Mw9V7504dlEiatSvnyibibHCrVQO2GEYsJicPA/0?wx_fmt=jpeg',
-    }
-  }
-  console.log("newList is", newList);
-  return newList
-}

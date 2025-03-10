@@ -4,6 +4,7 @@
     "pages/home/home",
     "pages/detail/detail"
   ],
+  "subPackages": [],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
@@ -25,7 +26,7 @@
       },
       {
         "pagePath": "pages/home/home",
-        "text": "我们",
+        "text": "我的",
         "iconPath": "/images/me.png",
         "selectedIconPath": "/images/me_active.png"
       }

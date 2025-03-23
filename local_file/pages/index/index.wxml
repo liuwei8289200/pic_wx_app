@@ -1,9 +1,9 @@
 <!--pages/index/index.wxml-->
 <navigation-bar back title="图片浏览"></navigation-bar>
 <view class="top-bar">
-  <input class="search" placeholder="搜索"/>
-  <view class="logo">Logo</view>
-  <button class="help">帮助</button>
+  <!-- <input class="search" placeholder="搜索"/> -->
+  <image class="logo" src="../../images/logo.png" mode="aspectFit" />
+  <!-- <button class="help">帮助</button> -->
 </view>
 
 <swiper class="swiper" autoplay="true" interval="3000" indicator-dots="true" indicator-active-color="#4682b4">

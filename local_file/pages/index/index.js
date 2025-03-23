@@ -1,5 +1,5 @@
 import { installRouteBuilder } from './route'
-import { compareVersion, generateGridListNew } from './utils'
+import { compareVersion, generateGridListNew, getModelsGridImages } from './utils'
 
 const { screenWidth } = wx.getSystemInfoSync()
 const descList = [
@@ -11,8 +11,9 @@ Component({
   data: {
     swiperImages: [],
     imageList: [], // 瀑布流图片
-    page: 0, // 当前页数
+    page: 1, // 当前页数
     pageSize: 20, // 每页加载图片数量
+    isLoading: false, // 是否正在加载
     crossAxisCount: 3,
     crossAxisGap: 8,
     mainAxisGap: 8,
@@ -28,7 +29,7 @@ Component({
   methods:{
     onLoad() {
       this.loadSwiperImages();
-      this.loadGridList();
+      this.loadGridListFromModels();
       const { imageMargin, lineLimit } = this.data
       const { screenWidth } = wx.getSystemInfoSync()
       this.setData({
@@ -84,6 +85,26 @@ Component({
       }).catch(err => {
         console.error('获取图片列表失败:', err);
       });
+    },
+    //通过数据模型表拉取GridList
+    async loadGridListFromModels() {
+      if (this.data.isLoading) return; // 如果正在加载，直接返回
+      this.setData({ isLoading: true }); // 设置加载状态
+
+      // 模拟异步加载数据
+      await getModelsGridImages(this.data.page, this.data.pageSize).then(ans => {
+        this.setData({
+          gridList: this.data.gridList.concat(ans), // 追加新数据
+          page: this.data.page + 1, // 更新页数
+          isLoading: false // 重置加载状态
+        });
+      }).catch(err => {
+        console.error('获取图片列表失败:', err);
+        this.setData({ isLoading: false }); // 重置加载状态
+      });
+    },
+    loadMore() {
+      this.loadGridListFromModels(); // 加载更多数据
     },
     loadMoreImages() {
       this.loadWaterfallImages();

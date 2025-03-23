@@ -89,7 +89,48 @@ const imageList = [
     'https://res.wx.qq.com/op_res/BqgN85sXxTbk1kynEEihr0m2rsO-Y1l6Wsz_sFyu7vJj_ZTfI7GABbstLg4GUDTZVeZCKgDADCmsDjmF8rG7dw'
   ]
 ]
-
+const { init } = require("@cloudbase/wx-cloud-client-sdk");
+const client = init(wx.cloud)
+const models = client.models
+export const getModelsGridImages = async (pageNumber, pageSize) => {
+  console.log("enter in getModelsGridImages")
+  console.log("PageNumber is ", pageNumber)
+  console.log("PageSize is ", pageSize)
+  const { data } = await models.media_image.list({
+    filter: {
+      where: {}
+    },
+    pageSize: pageSize, // 分页大小，建议指定，如需设置为其它值，需要和 pageNumber 配合使用，两者同时指定才会生效
+    pageNumber: pageNumber, // 第几页
+    getCount: true, // 开启用来获取总数
+  });
+  console.log("getModelsGridImages", data);
+  const ans = [];
+  data.records.forEach(item => {
+    //console.log("item", item);
+    const ratioIdx = Math.floor(Math.random() * imageRatio.length)
+    const ratio = imageRatio[ratioIdx]
+    // src 根据指定格式拼接
+    const url = `https://6d69-mini-program-7gugok6cdb014aba-1258427370.tcb.qcloud.la/grid_images_online/${item.file_id}`;
+    
+    //根据: 分割
+    const short_title = item.title.split('：')[0];
+    ans.push({
+      // id 是自增序号
+      id: ans.length,
+      docid: item._id,
+      ...ratio,
+      src: url,
+      like: item.like_num,
+      content: item.description,
+      title: item.title,
+      short_title: short_title,
+    });
+    console.log("ans", ans);
+  });
+  
+  return ans; // 数据获取完成后，返回 ans
+}
 export const generateGridList = (childCount, columns) => {
   const ans = []
   for (let i = 0; i < childCount; i++) {

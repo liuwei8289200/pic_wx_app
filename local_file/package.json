@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@cloudbase/js-sdk": "^2.7.5-beta.0",
-    "@cloudbase/manager-node": "^4.2.9"
+    "@cloudbase/manager-node": "^4.2.9",
+    "@cloudbase/wx-cloud-client-sdk": "^1.5.0"
   }
 }

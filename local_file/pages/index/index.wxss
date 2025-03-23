@@ -31,13 +31,17 @@ view, scroll-view, page, image {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.search, .logo, .help {
+.search, .help {
   flex: 1;
   text-align: center;
   margin: 0 5px;
   padding: 5px;
   border-radius: 5px;
   font-size: 16px;
+}
+.logo{
+  width: 30px;
+  height: 30px;
 }
 
 .cnt {

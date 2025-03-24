@@ -36,25 +36,35 @@
 				</view>
 
 				<view class="detail-content">
-					<view class="detail-title">{{title}}</view>
-          <view class="detail-p" style="padding-bottom: 20px;" />
-					<view class="detail-p">🔥 {{content}}</view>
-          <view class="detail-p" style="padding-bottom: 10px;" />
+				<view class="detail-title">{{title}}</view>
+          		<view class="detail-p" style="padding-bottom: 20px;" />
+				<view class="detail-p">🔥 {{content}}</view>
+          		<view class="detail-p" style="padding-bottom: 10px;" />
 				</view>
-			</scroll-view>
-			<view class="footer">
-				<view class="footer-content">
-					<!-- <input class="footer-input" placeholder="说点什么..." /> -->
-					<!-- <span>
-						<text class="footer-icon">❤️</text>
-						317
-					</span>
-					<span>
-						<text class="footer-icon">⭐️</text>
-						723
-					</span> -->
+
+				<view class="comments-section">
+			<view class="comments-title">评论 ({{comments.length}})</view>
+			<view class="comment-item" wx:for="{{comments}}" wx:key="index">
+				<image class="comment-avatar" src="{{item.avatar}}" />
+				<view class="comment-content">
+				<view class="comment-user">{{item.username}}</view>
+				<view class="comment-text">{{item.content}}</view>
+				<view class="comment-time">{{item.time}}</view>
 				</view>
 			</view>
+			</view>
+			</scroll-view>
+			<view class="footer">
+        	<view class="footer-content">
+          <input 
+            class="comment-input" 
+            placeholder="写下你的评论..." 
+            value="{{commentText}}"
+            bindinput="onCommentInput"
+          />
+          <view class="send-btn" bindtap="sendComment">发送</view>
+        </view>
+      </view>
 		</view>
 	</view>
 </pan-gesture-handler>

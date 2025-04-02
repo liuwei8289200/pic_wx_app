@@ -25,16 +25,8 @@
 			 show-scrollbar="{{false}}"
 			>
 				<view>
-					<swiper id="swiper" style="width: 100%; height: {{swiperHeight}}px;" indicator-dots>
-						<swiper-item>
-							<image class="detail-image" mode="widthFix" src="{{url}}" />
-						</swiper-item>
-						<!-- <swiper-item wx:for="{{imageList}}" wx:key="index">
-							<image class="detail-image" mode="widthFix" src="{{item}}" />
-						</swiper-item> -->
-					</swiper>
+					<image class="detail-image" mode="widthFix" src="{{url}}" style="width: 100%; height: {{swiperHeight}}px;" bindlongpress="saveImageToAlbum" />
 				</view>
-
 				<view class="detail-content">
 				<view class="detail-title">{{title}}</view>
           		<view class="detail-p" style="padding-bottom: 20px;" />
@@ -55,16 +47,51 @@
 			</view>
 			</scroll-view>
 			<view class="footer">
-        	<view class="footer-content">
-          <input 
-            class="comment-input" 
-            placeholder="写下你的评论..." 
-            value="{{commentText}}"
-            bindinput="onCommentInput"
-          />
-          <view class="send-btn" bindtap="sendComment">发送</view>
-        </view>
-      </view>
+				<view class="footer-content">
+					<!-- 左侧分享按钮 -->
+					<view class="action-group">
+						<button class="share-btn" open-type="share">
+							<view class="action-btn-inner">
+								<image class="action-icon" src="/images/icon_share.png"></image>
+								<text class="action-text">分享</text>
+							</view>
+						</button>
+					</view>
+
+					<!-- 右侧按钮组 -->
+					<view class="right-actions">
+						<view class="action-group" bindtap="handleLike">
+							<view class="action-btn">
+								<view class="action-btn-inner">
+									<image class="action-icon" src="{{isLiked ? '/images/icon_like_active.png' : '/images/icon_like.png'}}"></image>
+									<text class="action-text">{{likeCount}}</text>
+								</view>
+							</view>
+						</view>
+						<view class="action-group" bindtap="showCommentInput">
+							<view class="action-btn">
+								<view class="action-btn-inner">
+									<image class="action-icon" src="/images/icon_comment.png"></image>
+									<text class="action-text">{{commentCount}}</text>
+								</view>
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
+			<!-- 评论输入框浮层 -->
+			<view class="comment-input-layer" wx:if="{{showCommentInput}}">
+				<view class="comment-input-wrapper">
+					<input 
+						class="comment-input" 
+						placeholder="写下你的评论..." 
+						value="{{commentText}}"
+						focus="{{showCommentInput}}"
+						bindinput="onCommentInput"
+					/>
+					<view class="send-btn" bindtap="sendComment">发送</view>
+				</view>
+			</view>
 		</view>
 	</view>
 </pan-gesture-handler>

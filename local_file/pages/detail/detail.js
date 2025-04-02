@@ -9,13 +9,158 @@ Page({
       swiperHeight: screenWidth / options.ratio,
       url: options.url,
       short_title : options.short_title,
-      title: options.title
+      title: options.title,
+      isLiked: false,
+      likeCount: 10,
+      isCollected: false,
+      collectCount: 10,
+      commentCount: 10,
+      showCommentInput: false,
+      commentText: ''
     });
   },
   
   // 返回上一页
   goBack() {
     wx.navigateBack();
+  },
+
+  handleLike() {
+    const isLiked = !this.data.isLiked;
+    const likeCount = this.data.likeCount + (isLiked ? 1 : -1);
+    this.setData({
+      isLiked,
+      likeCount
+    });
+    // TODO: 调用后端API更新点赞状态
+  },
+
+  handleCollect() {
+    const isCollected = !this.data.isCollected;
+    const collectCount = this.data.collectCount + (isCollected ? 1 : -1);
+    this.setData({
+      isCollected,
+      collectCount
+    });
+    // TODO: 调用后端API更新收藏状态
+  },
+
+  showCommentInput() {
+    this.setData({
+      showCommentInput: true
+    });
+  },
+
+  onCommentInput(e) {
+    this.setData({
+      commentText: e.detail.value
+    });
+  },
+
+  sendComment() {
+    if (!this.data.commentText.trim()) {
+      wx.showToast({
+        title: '请输入评论内容',
+        icon: 'none'
+      });
+      return;
+    }
+
+    // TODO: 调用后端API发送评论
+    console.log('发送评论:', this.data.commentText);
+
+    this.setData({
+      showCommentInput: false,
+      commentText: ''
+    });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: this.data.title,
+      path: '/pages/detail/detail?id=' + this.data.id
+    };
+  },
+
+  saveImageToAlbum() {
+    // 获取相册授权
+    wx.getSetting({
+      success: (res) => {
+        if (!res.authSetting['scope.writePhotosAlbum']) {
+          // 如果没有权限，获取权限
+          wx.authorize({
+            scope: 'scope.writePhotosAlbum',
+            success: () => {
+              this.downloadAndSaveImage();
+            },
+            fail: () => {
+              wx.showModal({
+                title: '提示',
+                content: '需要您授权保存图片到相册',
+                showCancel: false,
+                success: (res) => {
+                  if (res.confirm) {
+                    // 打开设置页面让用户手动授权
+                    wx.openSetting();
+                  }
+                }
+              });
+            }
+          });
+        } else {
+          // 有权限，直接保存
+          this.downloadAndSaveImage();
+        }
+      }
+    });
+  },
+
+  downloadAndSaveImage() {
+    wx.showLoading({
+      title: '保存中...',
+    });
+
+    // 先下载图片
+    wx.downloadFile({
+      url: this.data.url,
+      success: (res) => {
+        if (res.statusCode === 200) {
+          // 下载成功后保存到相册
+          wx.saveImageToPhotosAlbum({
+            filePath: res.tempFilePath,
+            success: () => {
+              wx.hideLoading();
+              wx.showToast({
+                title: '已保存到相册',
+                icon: 'success'
+              });
+            },
+            fail: (err) => {
+              wx.hideLoading();
+              wx.showToast({
+                title: '保存失败',
+                icon: 'none'
+              });
+              console.error('保存失败:', err);
+            }
+          });
+        } else {
+          wx.hideLoading();
+          wx.showToast({
+            title: '图片下载失败',
+            icon: 'none'
+          });
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        wx.showToast({
+          title: '图片下载失败',
+          icon: 'none'
+        });
+        console.error('下载失败:', err);
+      }
+    });
   }
 });
 // import { Curves, CurveAnimation, lerp } from '../index/route'

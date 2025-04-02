@@ -43,5 +43,15 @@
       "defaultContentBox": true,
       "disableABTest": true
     }
+  },
+  "permission": {
+    "scope": {
+      "album": {
+        "desc": "保存图片到相册"
+      }
+    },
+    "scope.writePhotosAlbum": {
+      "desc": "保存图片到相册"
+    }
   }
 }

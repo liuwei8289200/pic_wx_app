@@ -83,33 +83,43 @@ Page({
   },
 
   saveImageToAlbum() {
-    // 获取相册授权
-    wx.getSetting({
+    // 先弹出确认框
+    wx.showModal({
+      title: '提示',
+      content: '是否保存图片到相册？',
       success: (res) => {
-        if (!res.authSetting['scope.writePhotosAlbum']) {
-          // 如果没有权限，获取权限
-          wx.authorize({
-            scope: 'scope.writePhotosAlbum',
-            success: () => {
-              this.downloadAndSaveImage();
-            },
-            fail: () => {
-              wx.showModal({
-                title: '提示',
-                content: '需要您授权保存图片到相册',
-                showCancel: false,
-                success: (res) => {
-                  if (res.confirm) {
-                    // 打开设置页面让用户手动授权
-                    wx.openSetting();
+        if (res.confirm) {
+          // 用户点击确定，继续保存流程
+          // 获取相册授权
+          wx.getSetting({
+            success: (res) => {
+              if (!res.authSetting['scope.writePhotosAlbum']) {
+                // 如果没有权限，获取权限
+                wx.authorize({
+                  scope: 'scope.writePhotosAlbum',
+                  success: () => {
+                    this.downloadAndSaveImage();
+                  },
+                  fail: () => {
+                    wx.showModal({
+                      title: '提示',
+                      content: '需要您授权保存图片到相册',
+                      showCancel: false,
+                      success: (res) => {
+                        if (res.confirm) {
+                          // 打开设置页面让用户手动授权
+                          wx.openSetting();
+                        }
+                      }
+                    });
                   }
-                }
-              });
+                });
+              } else {
+                // 有权限，直接保存
+                this.downloadAndSaveImage();
+              }
             }
           });
-        } else {
-          // 有权限，直接保存
-          this.downloadAndSaveImage();
         }
       }
     });

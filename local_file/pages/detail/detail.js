@@ -20,6 +20,13 @@ Page({
     });
   },
   
+  // 页面点击事件，用于关闭评论输入框
+  onPageTap() {
+    if (this.data.showCommentInput) {
+      this.hideCommentInput();
+    }
+  },
+  
   // 返回上一页
   goBack() {
     wx.navigateBack();
@@ -46,9 +53,20 @@ Page({
   },
 
   showCommentInput() {
+    console.log("showCommentInput")
     this.setData({
       showCommentInput: true
     });
+  },
+
+  hideCommentInput() {
+    this.setData({
+      showCommentInput: false
+    });
+  },
+
+  stopPropagation() {
+    // 阻止事件冒泡，空函数即可
   },
 
   onCommentInput(e) {

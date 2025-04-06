@@ -97,6 +97,7 @@ view, scroll-view, page, image {
 .action-group {
   display: flex;
   align-items: center;
+  height: 3rem
 }
 
 /* 右侧按钮组的样式 */
@@ -119,6 +120,14 @@ view, scroll-view, page, image {
   line-height: normal;
   display: flex;
   align-items: center;
+}
+
+.tmp-b{
+  width: 5rem;
+}
+
+.tmp-a{
+  margin-left: 0.05rem;
 }
 
 .share-btn::after {
@@ -149,15 +158,17 @@ view, scroll-view, page, image {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #fff;
-  padding: 20rpx;
-  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
   z-index: 101;
 }
 
 .comment-input-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
+  background-color: #fff;
+  padding: 20rpx;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+  z-index: 102;
 }
 
 .comment-input {

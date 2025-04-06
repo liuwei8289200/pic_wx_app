@@ -37,16 +37,16 @@ const nicknames = [
 ]
 
 const imageRatio = [
-  {
-    width: 3,
-    height: 4,
-    imageRatio: 3 / 4,
-  },
-  {
-    width: 4,
-    height: 3,
-    imageRatio: 4 / 3,
-  },
+  // {
+  //   width: 3,
+  //   height: 4,
+  //   imageRatio: 3 / 4,
+  // },
+  // {
+  //   width: 4,
+  //   height: 3,
+  //   imageRatio: 4 / 3,
+  // },
   {
     width: 1,
     height: 1,

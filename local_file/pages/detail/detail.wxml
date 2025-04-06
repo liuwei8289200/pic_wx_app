@@ -1,6 +1,6 @@
 <pan-gesture-handler worklet:ongesture="handlePanGesture">
 	<view id="fake-host">
-		<view id="page">
+		<view id="page" bindtap="onPageTap">
 			<view class="navigation-bar">
 				<view class="navigation-bar-content">
 					<image class="navigation-bar-avatar" src="https://res.wx.qq.com/op_res/BqgN85sXxTbk1kynEEihrwQPXmcn86nOyioRnPAfkrbZteUWsKfEpgoYZ1pk-3TMTc_qXFSElIgkvILR-zzh1Q" />
@@ -49,7 +49,7 @@
 			<view class="footer">
 				<view class="footer-content">
 					<!-- 左侧分享按钮 -->
-					<view class="action-group">
+					<view class="action-group tmp-b">
 						<button class="share-btn" open-type="share">
 							<view class="action-btn-inner">
 								<image class="action-icon" src="/images/icon_share.png"></image>
@@ -60,7 +60,7 @@
 
 					<!-- 右侧按钮组 -->
 					<view class="right-actions">
-						<view class="action-group" bindtap="handleLike">
+						<view class="action-group tmp-a" bindtap="handleLike">
 							<view class="action-btn">
 								<view class="action-btn-inner">
 									<image class="action-icon" src="{{isLiked ? '/images/icon_like_active.png' : '/images/icon_like.png'}}"></image>
@@ -68,7 +68,7 @@
 								</view>
 							</view>
 						</view>
-						<view class="action-group" bindtap="showCommentInput">
+						<view class="action-group" catchtap="showCommentInput">
 							<view class="action-btn">
 								<view class="action-btn-inner">
 									<image class="action-icon" src="/images/icon_comment.png"></image>
@@ -80,7 +80,7 @@
 				</view>
 			</view>
 			<!-- 评论输入框浮层 -->
-			<view class="comment-input-layer" wx:if="{{showCommentInput}}">
+			<view class="comment-input-layer" wx:if="{{showCommentInput}}" catchtap="stopPropagation">
 				<view class="comment-input-wrapper">
 					<input 
 						class="comment-input" 

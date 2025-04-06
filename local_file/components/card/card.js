@@ -203,5 +203,72 @@ Component({
         globalThis['RouteCardDestRect'].value = data.end
       }
     },
+    saveImage(e) {
+      const { url } = e.currentTarget.dataset
+      wx.showModal({
+        title: '提示',
+        content: '是否保存图片到相册？',
+        success: (res) => {
+          if (res.confirm) {
+            wx.getSetting({
+              success: (res) => {
+                if (!res.authSetting['scope.writePhotosAlbum']) {
+                  wx.authorize({
+                    scope: 'scope.writePhotosAlbum',
+                    success: () => {
+                      this.doSaveImage(url)
+                    },
+                    fail: () => {
+                      wx.showModal({
+                        title: '提示',
+                        content: '需要您授权保存图片到相册',
+                        success: (res) => {
+                          if (res.confirm) {
+                            wx.openSetting()
+                          }
+                        }
+                      })
+                    }
+                  })
+                } else {
+                  this.doSaveImage(url)
+                }
+              }
+            })
+          }
+        }
+      })
+    },
+
+    doSaveImage(url) {
+      wx.downloadFile({
+        url: url,
+        success: (res) => {
+          if (res.statusCode === 200) {
+            wx.saveImageToPhotosAlbum({
+              filePath: res.tempFilePath,
+              success: () => {
+                wx.showToast({
+                  title: '保存成功',
+                  icon: 'success'
+                })
+              },
+              fail: () => {
+                wx.showToast({
+                  title: '保存失败',
+                  icon: 'error'
+                })
+              }
+            })
+          }
+        },
+        fail: () => {
+          wx.showToast({
+            title: '下载失败',
+            icon: 'error'
+          })
+        }
+      })
+    }
   },
 })

@@ -35,16 +35,18 @@
 				</view>
 
 				<view class="comments-section">
-			<view class="comments-title">评论 ({{comments.length}})</view>
-			<view class="comment-item" wx:for="{{comments}}" wx:key="index">
-				<image class="comment-avatar" src="{{item.avatar}}" />
-				<view class="comment-content">
-				<view class="comment-user">{{item.username}}</view>
-				<view class="comment-text">{{item.content}}</view>
-				<view class="comment-time">{{item.time}}</view>
+					<view class="comments-title">评论 ({{comments.length}})</view>
+					<view class="comment-list">
+						<view class="comment-item" wx:for="{{comments}}" wx:key="_id">
+							<image class="comment-avatar" src="{{item.avatar}}" />
+							<view class="comment-content">
+								<view class="comment-user">{{item.username}}</view>
+								<view class="comment-text">{{item.content}}</view>
+								<view class="comment-time">{{item.time}}</view>
+							</view>
+						</view>
+					</view>
 				</view>
-			</view>
-			</view>
 			</scroll-view>
 			<view class="footer">
 				<view class="footer-content">

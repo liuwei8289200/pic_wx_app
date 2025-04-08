@@ -191,18 +191,37 @@ view, scroll-view, page, image {
 
 .comments-section {
   padding: 20rpx;
+  margin-bottom: 120rpx;
 }
 
 .comments-title {
   font-size: 32rpx;
   font-weight: bold;
   margin-bottom: 20rpx;
+  padding-left: 10rpx;
+  border-left: 8rpx solid #07c160;
+}
+
+.comment-list {
+  display: flex;
+  flex-direction: column;
 }
 
 .comment-item {
   display: flex;
   padding: 20rpx 0;
   border-bottom: 1rpx solid #eee;
+  position: relative;
+}
+
+.comment-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 32rpx;
+  top: 80rpx;
+  bottom: 0;
+  width: 2rpx;
+  background-color: #eee;
 }
 
 .comment-avatar {
@@ -210,22 +229,41 @@ view, scroll-view, page, image {
   height: 64rpx;
   border-radius: 32rpx;
   margin-right: 20rpx;
+  flex-shrink: 0;
 }
 
 .comment-content {
   flex: 1;
+  background-color: #f8f8f8;
+  border-radius: 10rpx;
+  padding: 16rpx;
+  position: relative;
+}
+
+.comment-content::before {
+  content: '';
+  position: absolute;
+  left: -16rpx;
+  top: 20rpx;
+  width: 0;
+  height: 0;
+  border-top: 8rpx solid transparent;
+  border-bottom: 8rpx solid transparent;
+  border-right: 16rpx solid #f8f8f8;
 }
 
 .comment-user {
   font-size: 28rpx;
   font-weight: bold;
   margin-bottom: 8rpx;
+  color: #333;
 }
 
 .comment-text {
   font-size: 28rpx;
   color: #333;
   margin-bottom: 8rpx;
+  word-break: break-all;
 }
 
 .comment-time {

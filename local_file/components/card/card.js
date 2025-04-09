@@ -168,9 +168,9 @@ Component({
       // })
     },
     navigateTo(e) {
-      const { index, url, content, ratio, title, short_title } = e.currentTarget.dataset
+      const { index, url, content, ratio, title, short_title, docid } = e.currentTarget.dataset
       console.log("test111111", e.currentTarget.dataset)
-      const urlContent = `../../pages/detail/detail?index=${index}&url=${url}&content=${content}&ratio=${ratio}&title=${title}&short_title=${short_title}`
+      const urlContent = `../../pages/detail/detail?index=${index}&url=${url}&content=${content}&ratio=${ratio}&title=${title}&short_title=${short_title}&image_id=${docid}`
       console.log("test22222222", urlContent)
       wx.navigateTo({
         url: urlContent,

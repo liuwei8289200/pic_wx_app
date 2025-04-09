@@ -35,7 +35,7 @@
 				</view>
 
 				<view class="comments-section">
-					<view class="comments-title">评论 ({{comments.length}})</view>
+					<view v-if="comments.length > 0" class="comments-title">评论 ({{comments.length}})</view>
 					<view class="comment-list">
 						<view class="comment-item" wx:for="{{comments}}" wx:key="_id">
 							<image class="comment-avatar" src="{{item.avatar}}" />

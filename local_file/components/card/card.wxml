@@ -3,7 +3,7 @@
 	<share-element key="se-key{{index}}" rect-tween-type="cubic-bezier(0.4, 0.0, 0.2, 1.0)" worklet:onframe="handleFrame" transition-on-gesture="{{true}}" style="width: 100%; height: 100%;">
 		<view style="position: relative;">
 			<view class="card_wrap">
-				<image class="card_img" fade-in src="{{item.src}}" bindtap="navigateTo" bindlongpress="saveImage" data-index="{{index}}" data-url="{{item.src}}" data-content="{{item.content}}" data-ratio="{{item.imageRatio}}" data-title="{{item.title}}" data-short_title="{{item.short_title}}" style="height: {{cardWidth / item.imageRatio}}px; background-color: {{item.color}};"/>
+				<image class="card_img" fade-in src="{{item.src}}" bindtap="navigateTo" bindlongpress="saveImage" data-index="{{index}}" data-url="{{item.src}}" data-content="{{item.content}}" data-ratio="{{item.imageRatio}}" data-title="{{item.title}}" data-short_title="{{item.short_title}}" data-docid="{{item.docid}}" style="height: {{cardWidth / item.imageRatio}}px; background-color: {{item.color}};"/>
 				<view class="card_desc" style="color: #000;">
 					<view class="card_content">{{item.short_title}}</view>
 					<view class="card_footer">

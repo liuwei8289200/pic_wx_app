@@ -10,13 +10,72 @@ Page({
   data: {
     gridList: [], // 初始化卡片列表
     cardWidth: (screenWidth - 4 * 2 - 4) / 2, // 减去间距
+    hasUserInfo: false,
+    userInfo: null,
+    currentTab: 'likes', // 默认显示赞过的图片标签页
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad(options) {
+    this.checkUserInfo();
     this.loadGridList(); // 加载卡片列表
+  },
+
+  /**
+   * 检查用户信息
+   */
+  checkUserInfo() {
+    const userInfo = wx.getStorageSync('userInfo');
+    this.setData({
+      hasUserInfo: !!userInfo && !!userInfo.nickName && !!userInfo.avatarUrl,
+      userInfo: userInfo || null
+    });
+  },
+
+  /**
+   * 切换标签页
+   */
+  switchTab(e) {
+    const tab = e.currentTarget.dataset.tab;
+    this.setData({
+      currentTab: tab
+    });
+  },
+
+  /**
+   * 跳转到用户信息页面
+   */
+  goToUserProfile() {
+    wx.navigateTo({
+      url: '/pages/userProfile/userProfile',
+      events: {
+        // 监听用户信息更新
+        userInfoUpdated: () => {
+          this.checkUserInfo();
+        }
+      }
+    });
+  },
+
+  /**
+   * 退出登录
+   */
+  handleLogout() {
+    wx.showModal({
+      title: '提示',
+      content: '确定要退出登录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.removeStorageSync('userInfo');
+          this.setData({
+            hasUserInfo: false,
+            userInfo: null
+          });
+        }
+      }
+    });
   },
 
   loadGridList() {
@@ -40,6 +99,14 @@ Page({
     const ans = [];
     const openid = wx.getStorageSync('openId');
     console.log("openid is", openid);
+
+    if (!openid) {
+      this.setData({
+        gridList: []
+      });
+      return;
+    }
+
     wx.cloud.callFunction({
       name: 'dbCommand',
       data: {
@@ -51,7 +118,10 @@ Page({
       success: res => {
         console.log('获取图片列表成功:', res);
         //判断res.result是否为空, 为空的话直接跳出
-        if (res.result.length === 0) {
+        if (!res.result || res.result.length === 0) {
+          this.setData({
+            gridList: []
+          });
           return;
         } 
         const docidList = res.result[0].like_pic_docid_list;
@@ -92,6 +162,9 @@ Page({
       },
       fail: err => {
         console.error('获取图片列表失败:', err);
+        this.setData({
+          gridList: []
+        });
       }
     });
   },
@@ -115,7 +188,11 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow() {
-
+    // 每次显示页面时检查用户信息
+    this.checkUserInfo();
+    if (this.data.hasUserInfo) {
+      this.loadGridList();
+    }
   },
 
   /**
@@ -136,20 +213,28 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh() {
-
+    this.loadGridList();
+    wx.stopPullDownRefresh();
   },
 
   /**
    * 页面上拉触底事件的处理函数
    */
   onReachBottom() {
+    // 可以实现加载更多功能
+  },
 
+  loadMore() {
+    // 可以实现加载更多功能
   },
 
   /**
    * 用户点击右上角分享
    */
   onShareAppMessage() {
-
+    return {
+      title: '我的收藏',
+      path: '/pages/index/index'
+    };
   }
 })

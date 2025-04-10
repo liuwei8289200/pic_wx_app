@@ -1,0 +1,21 @@
+<!--pages/userProfile/userProfile.wxml-->
+<navigation-bar back title="个人信息"></navigation-bar>
+
+<view class="container">
+  <view class="title">完善个人信息</view>
+  
+  <view class="avatar-section">
+    <view class="section-title">头像</view>
+    <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+      <image class="avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
+      <view class="avatar-hint">点击更换头像</view>
+    </button>
+  </view>
+  
+  <view class="nickname-section">
+    <view class="section-title">昵称</view>
+    <input type="nickname" class="nickname-input" placeholder="请输入昵称" bindinput="onNicknameInput" value="{{nickname}}"/>
+  </view>
+  
+  <button class="save-btn" bindtap="saveUserInfo">保存</button>
+</view> 

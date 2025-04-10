@@ -221,10 +221,11 @@ Page({
       console.log("msgSecCheck comment is", this.data.commentText)
       console.log("msgSecCheck openid is", wx.getStorageSync('openId'))
       console.log("msgSecCheck result", result)
-      if (result && result.errCode === 0) {
+      if (result && result.result.errCode === 0) {
         // 内容安全检测通过，保存评论到云数据库
         // 获取当前用户信息
         const userInfo = wx.getStorageSync('userInfo') || {};
+        console.log("userInfo", userInfo)
         
         // 添加评论记录
         await models.media_comment.add({

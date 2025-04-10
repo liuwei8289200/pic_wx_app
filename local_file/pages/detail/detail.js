@@ -212,10 +212,15 @@ Page({
       const result = await wx.cloud.callFunction({
         name: 'msgSecCheck',
         data: {
-          content: this.data.commentText
+          comment: this.data.commentText,
+          scene:2,
+          openid: wx.getStorageSync('openId')
         }
-      })
-      
+      }
+    )
+      console.log("msgSecCheck comment is", this.data.commentText)
+      console.log("msgSecCheck openid is", wx.getStorageSync('openId'))
+      console.log("msgSecCheck result", result)
       if (result && result.errCode === 0) {
         // 内容安全检测通过，保存评论到云数据库
         // 获取当前用户信息

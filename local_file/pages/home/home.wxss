@@ -5,25 +5,35 @@ page {
   height: 100vh;
   background-color: #f5f5f5;
 }
+
+.page-container {
+  padding-top: 20rpx;
+  padding-bottom: 100rpx;
+}
+
 scroll-view {
-    background-color: #f4f4f4;
-  }
+  background-color: #f4f4f4;
+}
+
 .swiper {
-    width: 100%;
-    height: 30vh;
-    overflow: hidden;
+  width: 100%;
+  height: 30vh;
+  overflow: hidden;
 }
+
 .slide-container {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    height: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
+
 view, scroll-view, page, image {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
- .top-bar {
+
+.top-bar {
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -43,27 +53,29 @@ view, scroll-view, page, image {
 }
 
 .cnt {
-    top: 0;
-    width: 100%;
-    height: 50%;
-    display: flex;
-    flex-direction: column;
+  top: 0;
+  width: 100%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
 }
   
 .album {
-    height: 0;
-    flex: 1;
-    margin-bottom: 12px;
+  height: 0;
+  flex: 1;
+  margin-bottom: 12px;
 }
   
 .safe-area-inset-bottom {
-    height: env(safe-area-inset-bottom, 50px);
+  height: env(safe-area-inset-bottom, 50px);
 }
 
 .user-info-container {
   background-color: #ffffff;
-  padding: 40rpx 30rpx;
-  margin-bottom: 20rpx;
+  padding: 30rpx;
+  margin: 20rpx 20rpx 20rpx;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
 }
 
 .user-info, .user-info-placeholder {
@@ -93,7 +105,8 @@ view, scroll-view, page, image {
 .tabs {
   display: flex;
   background-color: #ffffff;
-  margin-bottom: 20rpx;
+  margin: 0 20rpx 20rpx;
+  border-radius: 12rpx;
 }
 
 .tab {
@@ -124,6 +137,9 @@ view, scroll-view, page, image {
 
 .content-area {
   background-color: #ffffff;
+  margin: 0 20rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
 }
 
 .settings-list {

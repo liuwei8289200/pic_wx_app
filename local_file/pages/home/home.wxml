@@ -1,61 +1,63 @@
 <!--pages/home/home.wxml-->
 <navigation-bar back title="个人中心"></navigation-bar>
 
-<!-- 用户信息区域 -->
-<view class="user-info-container">
-  <view class="user-info" wx:if="{{hasUserInfo}}">
-    <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
-    <view class="nickname">{{userInfo.nickName}}</view>
-  </view>
-  <view class="user-info-placeholder" wx:else bindtap="goToUserProfile">
-    <image class="avatar" src="/images/default_avatar.png" mode="aspectFill"></image>
-    <view class="login-text">点击登录</view>
-  </view>
-</view>
-
-<!-- 标签页 -->
-<view class="tabs">
-  <view class="tab {{currentTab === 'likes' ? 'active' : ''}}" bindtap="switchTab" data-tab="likes">
-    赞过的图片
-  </view>
-  <view class="tab {{currentTab === 'settings' ? 'active' : ''}}" bindtap="switchTab" data-tab="settings">
-    设置
-  </view>
-</view>
-
-<!-- 赞过的图片列表 -->
-<view class="content-area" wx:if="{{currentTab === 'likes'}}">
-  <scroll-view
-   scroll-y
-   style="height: calc(100vh - 280rpx); width: 100%;"
-   show-scrollbar="{{false}}"
-   bindscrolltolower="loadMore"
-  >
-    <grid-view type="masonry" wx:if="{{gridList.length > 0}}">
-      <card
-        wx:for="{{gridList}}"
-        wx:key="id"
-        card-width="{{cardWidth}}"
-        index="{{index}}"
-        item="{{item}}"
-      />
-    </grid-view>
-    <view class="empty-state" wx:else>
-      <image src="/images/empty.png" mode="aspectFit" class="empty-icon"></image>
-      <view class="empty-text">您还没有赞过图片</view>
+<view class="page-container">
+  <!-- 用户信息区域 -->
+  <view class="user-info-container">
+    <view class="user-info" wx:if="{{hasUserInfo}}">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <view class="nickname">{{userInfo.nickName}}</view>
     </view>
-  </scroll-view>
-</view>
-
-<!-- 设置页面 -->
-<view class="content-area" wx:if="{{currentTab === 'settings'}}">
-  <view class="settings-list">
-    <view class="settings-item" bindtap="goToUserProfile">
-      <text>修改个人信息</text>
-      <image src="/images/arrow_right.png" class="arrow-icon"></image>
+    <view class="user-info-placeholder" wx:else bindtap="goToUserProfile">
+      <image class="avatar" src="/images/default_avatar.png" mode="aspectFill"></image>
+      <view class="login-text">点击登录</view>
     </view>
-    <view class="settings-item" wx:if="{{hasUserInfo}}" bindtap="handleLogout">
-      <text>退出登录</text>
+  </view>
+
+  <!-- 标签页 -->
+  <view class="tabs">
+    <view class="tab {{currentTab === 'likes' ? 'active' : ''}}" bindtap="switchTab" data-tab="likes">
+      赞过的图片
+    </view>
+    <view class="tab {{currentTab === 'settings' ? 'active' : ''}}" bindtap="switchTab" data-tab="settings">
+      设置
+    </view>
+  </view>
+
+  <!-- 赞过的图片列表 -->
+  <view class="content-area" wx:if="{{currentTab === 'likes'}}">
+    <scroll-view
+      scroll-y
+      style="height: calc(100vh - 380rpx); width: 100%;"
+      show-scrollbar="{{false}}"
+      bindscrolltolower="loadMore"
+    >
+      <grid-view type="masonry" wx:if="{{gridList.length > 0}}">
+        <card
+          wx:for="{{gridList}}"
+          wx:key="id"
+          card-width="{{cardWidth}}"
+          index="{{index}}"
+          item="{{item}}"
+        />
+      </grid-view>
+      <view class="empty-state" wx:else>
+        <image src="/images/empty.png" mode="aspectFit" class="empty-icon"></image>
+        <view class="empty-text">您还没有赞过图片</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 设置页面 -->
+  <view class="content-area" wx:if="{{currentTab === 'settings'}}">
+    <view class="settings-list">
+      <view class="settings-item" bindtap="goToUserProfile">
+        <text>修改个人信息</text>
+        <image src="/images/arrow_right.png" class="arrow-icon"></image>
+      </view>
+      <view class="settings-item" wx:if="{{hasUserInfo}}" bindtap="handleLogout">
+        <text>退出登录</text>
+      </view>
     </view>
   </view>
 </view>

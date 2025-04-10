@@ -1,7 +1,7 @@
 <!--pages/userProfile/userProfile.wxml-->
 <navigation-bar back title="个人信息"></navigation-bar>
 
-<view class="container">
+<view class="page-container">
   <view class="title">完善个人信息</view>
   
   <view class="avatar-section">

@@ -1,4 +1,8 @@
 // pages/userProfile/userProfile.js
+const { init } = require("@cloudbase/wx-cloud-client-sdk");
+const client = init(wx.cloud);
+const models = client.models;
+
 const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
 
 Page({
@@ -11,6 +15,7 @@ Page({
   onLoad() {
     // 获取已存储的用户信息
     const userInfo = wx.getStorageSync('userInfo') || {};
+    console.log("userInfo", userInfo)
     if (userInfo.avatarUrl) {
       this.setData({
         avatarUrl: userInfo.avatarUrl
@@ -96,24 +101,52 @@ Page({
       // 保存到云数据库
       wx.showLoading({ title: '保存信息中...' });
       
-      const db = wx.cloud.database();
-      
       // 检查用户记录是否已存在
-      const userQuery = await db.collection('user_info').where({
-        _openid: openId
-      }).get();
+      console.log("openId", openId)
+      const userQuery = await models.user_info.get({
+        filter: {
+          where: {
+            $and: [
+              {
+                openid: {
+                  $eq: openId, // 推荐传入_id数据标识进行操作
+                },
+              },
+            ]
+          }
+        },
+      });
+      console.log("userQuery", userQuery)
       
-      if (userQuery.data && userQuery.data.length > 0) {
+      if (userQuery.data) {
         // 更新现有记录
-        await db.collection('user_info').where({
-          _openid: openId
-        }).update({
-          data: userInfo
+        await models.user_info.update({
+          data: {
+              user_name: this.data.nickname,  // 用户名称
+              openid: openId,  // openid
+              avatar: avatarUrl,  // 头像链接
+            },
+          filter: {
+            where: {
+              $and: [
+                {
+                  openid: {
+                    $eq: openId, // 推荐传入_id数据标识进行操作
+                  },
+                },
+              ]
+            }
+          }
         });
+        
       } else {
         // 创建新记录
-        await models.collection('user_info').create({
-          data: userInfo
+        await models.user_info.create({
+          data: {
+              user_name: this.data.nickname,  // 用户名称
+              openid: openId,  // openid
+              avatar: avatarUrl,  // 头像链接
+            }
         });
       }
       

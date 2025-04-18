@@ -35,18 +35,18 @@ Page({
   // 初始化点赞状态
   async initLikeStatus() {
     try {
-      // 获取当前用户信息
-      const userInfo = wx.getStorageSync('userInfo') || {};
-      const user_id = userInfo._openid || '';
+      // 检查用户登录状态
+      const loginStatus = wx.getStorageSync('loginStatus');
+      const openId = wx.getStorageSync('openId');
       
-      if (!user_id) return;
+      if (!loginStatus || !openId) return;
       
       // 查询当前用户是否已点赞
       const { data: likeData } = await models.media_like.list({
         filter: {
           where: {
             image_id: this.data.image_id,
-            user_id: user_id
+            user_id: openId
           }
         }
       });
@@ -65,7 +65,8 @@ Page({
       
       if (imageData) {
         this.setData({
-          likeCount: imageData.likeCount || 0
+          likeCount: imageData.likeCount || 0,
+          commentCount: imageData.commentCount || 0
         });
       }
     } catch (err) {
@@ -86,18 +87,18 @@ Page({
   },
 
   async handleLike() {
+    // 检查用户登录状态
+    const loginStatus = wx.getStorageSync('loginStatus');
+    const openId = wx.getStorageSync('openId');
     
-    // 获取当前用户信息
-    const userInfo = wx.getStorageSync('userInfo') || {};
-    const user_id = userInfo._openid || '';
-    
-    if (!user_id) {
+    if (!loginStatus || !openId) {
       wx.showToast({
         title: '请先登录',
         icon: 'none'
       });
       return;
     }
+    
     const isLiked = !this.data.isLiked;
     const likeCount = this.data.likeCount + (isLiked ? 1 : -1);
     
@@ -112,7 +113,7 @@ Page({
         await models.media_like.add({
           data: {
             image_id: this.data.image_id,
-            user_id: user_id,
+            user_id: openId,
             createTime: new Date()
           }
         });
@@ -130,7 +131,7 @@ Page({
           filter: {
             where: {
               image_id: this.data.image_id,
-              user_id: user_id
+              user_id: openId
             }
           }
         });
@@ -193,17 +194,18 @@ Page({
   },
 
   async sendComment() {
-    //const userInfo = wx.getStorageSync('userInfo') || {};
-    //console.log("userInfo", userInfo)
-    const user_id = wx.getStorageSync('openId')
+    // 检查用户登录状态
+    const loginStatus = wx.getStorageSync('loginStatus');
+    const openId = wx.getStorageSync('openId');
     
-    if (!user_id) {
+    if (!loginStatus || !openId) {
       wx.showToast({
         title: '请先登录',
         icon: 'none'
       });
       return;
     }
+    
     if (!this.data.commentText.trim()) {
       wx.showToast({
         title: '请输入评论内容',
@@ -218,78 +220,41 @@ Page({
     });
 
     try {
+      // 获取当前用户信息
+      const userInfo = wx.getStorageSync('userInfo') || {};
+      
       // 先进行内容安全检测
       const result = await wx.cloud.callFunction({
         name: 'msgSecCheck',
         data: {
           comment: this.data.commentText,
-          scene:2,
-          openid: wx.getStorageSync('openId')
+          scene: 2,
+          openid: openId
         }
-      }
-    )
-      console.log("msgSecCheck comment is", this.data.commentText)
-      console.log("msgSecCheck openid is", wx.getStorageSync('openId'))
-      console.log("msgSecCheck result", result)
-      if (result && result.result.errCode === 0) {
+      });
+      
+      console.log("msgSecCheck comment is", this.data.commentText);
+      console.log("msgSecCheck openid is", openId);
+      console.log("msgSecCheck result", result);
+      
+      if (result && result.result.errCode === 0 && result) {
         // 内容安全检测通过，保存评论到云数据库
-        // 获取当前用户信息
-        const userInfo = wx.getStorageSync('userInfo') || {};
-        console.log("userInfo", userInfo)
-        
-        // 处理头像URL，如果是临时URL则上传到云存储
-        // let avatarUrl = userInfo.avatarUrl || '/images/default_avatar.png';
-        // if (avatarUrl.startsWith('http://tmp/') || avatarUrl.startsWith('wxfile://tmp/')) {
-        //   try {
-        //     // 下载临时文件
-        //     const tempFilePath = await new Promise((resolve, reject) => {
-        //       wx.downloadFile({
-        //         url: avatarUrl,
-        //         success: res => resolve(res.tempFilePath),
-        //         fail: err => reject(err)
-        //       });
-        //     });
-            
-        //     // 上传到云存储
-        //     const cloudPath = `avatars/${user_id}_${Date.now()}.jpg`;
-        //     const uploadResult = await wx.cloud.uploadFile({
-        //       cloudPath,
-        //       filePath: tempFilePath
-        //     });
-            
-        //     // 获取永久URL
-        //     avatarUrl = uploadResult.fileID;
-            
-        //     // 更新用户信息中的头像URL
-        //     const updatedUserInfo = {...userInfo, avatarUrl};
-        //     wx.setStorageSync('userInfo', updatedUserInfo);
-        //   } catch (err) {
-        //     console.error('上传头像失败:', err);
-        //     // 如果上传失败，使用默认头像
-        //     avatarUrl = '/images/default_avatar.png';
-        //   }
-        // }
-        
         // 添加评论记录
         await models.media_comment.create({
           data: {
             content: this.data.commentText,
-            image_id: {
-              _id: this.data.image_id // 使用_id作为关联字段
-            },
-            user_id: user_id,
-            user_name: userInfo.nickName || '匿名用户',
-            avatar: userInfo.avatarUrl,
+            image_id: this.data.image_id,
+            user_id: openId,
           }
         });
         
-        // // 评论成功，更新评论数
-        // await models.media_images.update({
-        //   id: this.data.image_id,
-        //   data: {
-        //     commentCount: models.command.inc(1)
-        //   }
-        // });
+        // 评论成功，更新评论数
+        await models.media_images.update({
+          id: this.data.image_id,
+          data: {
+            commentCount: models.command.inc(1)
+          }
+        });
         
         // 刷新评论列表
         this.loadComments();

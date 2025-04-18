@@ -92,7 +92,6 @@ Page({
       const userInfo = {
         avatarUrl: avatarUrl,
         nickName: this.data.nickname,
-        updateTime: new Date()
       };
       
       // 保存到本地缓存
@@ -103,6 +102,7 @@ Page({
       
       // 检查用户记录是否已存在
       console.log("openId", openId)
+      console.log("userInfo", userInfo)
       const userQuery = await models.user_info.get({
         filter: {
           where: {
@@ -118,9 +118,10 @@ Page({
       });
       console.log("userQuery", userQuery)
       
-      if (userQuery.data) {
+      if (userQuery.data.length > 0) {
         // 更新现有记录
-        await models.user_info.update({
+        
+        const {data} = await models.user_info.update({
           data: {
               user_name: this.data.nickname,  // 用户名称
               openid: openId,  // openid
@@ -138,16 +139,17 @@ Page({
             }
           }
         });
-        
+        console.log("更新用户信息结果", data)      
       } else {
         // 创建新记录
-        await models.user_info.create({
+        const {data} = await models.user_info.create({
           data: {
               user_name: this.data.nickname,  // 用户名称
               openid: openId,  // openid
               avatar: avatarUrl,  // 头像链接
             }
         });
+        console.log("创建用户信息结果", data)
       }
       
       wx.hideLoading();

@@ -222,9 +222,10 @@ Page({
     try {
       // 获取当前用户信息
       const userInfo = wx.getStorageSync('userInfo') || {};
+      console.log("userInfo", userInfo);
       
       // 先进行内容安全检测
-      const result = await wx.cloud.callFunction({
+      const respone = await wx.cloud.callFunction({
         name: 'msgSecCheck',
         data: {
           comment: this.data.commentText,
@@ -235,27 +236,24 @@ Page({
       
       console.log("msgSecCheck comment is", this.data.commentText);
       console.log("msgSecCheck openid is", openId);
-      console.log("msgSecCheck result", result);
+      console.log("msgSecCheck result", respone);
       
-      if (result && result.result.errCode === 0 && result) {
+      if (respone && respone.result.errCode === 0 && respone.result.result.suggest === "pass") {
         // 内容安全检测通过，保存评论到云数据库
         // 添加评论记录
         await models.media_comment.create({
           data: {
             content: this.data.commentText,
-            image_id: this.data.image_id,
-            user_id: openId,
+            image_id: {
+              _id: this.data.image_id,
+            },
+            user_id: {
+              _id: openId,
+            },
+            user_name: userInfo.user_name,
+            avatar: userInfo.avatar,
           }
         });
-        
-        // 评论成功，更新评论数
-        await models.media_images.update({
-          id: this.data.image_id,
-          data: {
-            commentCount: models.command.inc(1)
-          }
-        });
-        
         // 刷新评论列表
         this.loadComments();
         

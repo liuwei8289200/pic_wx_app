@@ -29,7 +29,7 @@ Page({
   checkUserInfo() {
     const userInfo = wx.getStorageSync('userInfo');
     this.setData({
-      hasUserInfo: !!userInfo && !!userInfo.nickName && !!userInfo.avatarUrl,
+      hasUserInfo: !!userInfo && !!userInfo.user_name && !!userInfo.avatar,
       userInfo: userInfo || null
     });
   },

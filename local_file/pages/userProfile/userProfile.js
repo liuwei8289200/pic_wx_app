@@ -7,8 +7,8 @@ const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia0
 
 Page({
   data: {
-    avatarUrl: defaultAvatarUrl,
-    nickname: '',
+    avatar: defaultAvatarUrl,
+    user_name: '',
     isUploading: false
   },
   
@@ -16,33 +16,34 @@ Page({
     // 获取已存储的用户信息
     const userInfo = wx.getStorageSync('userInfo') || {};
     console.log("userInfo", userInfo)
-    if (userInfo.avatarUrl) {
+    if (userInfo.avatar) {
       this.setData({
-        avatarUrl: userInfo.avatarUrl
+        avatar: userInfo.avatar
       });
     }
-    if (userInfo.nickName) {
+    if (userInfo.user_name) {
       this.setData({
-        nickname: userInfo.nickName
+        user_name: userInfo.user_name
       });
     }
   },
   
   onChooseAvatar(e) {
     const { avatarUrl } = e.detail;
+    console.log("avatar", avatarUrl)
     this.setData({
-      avatarUrl
+      avatar: avatarUrl
     });
   },
   
   onNicknameInput(e) {
     this.setData({
-      nickname: e.detail.value
+      user_name: e.detail.value
     });
   },
   
   async saveUserInfo() {
-    if (!this.data.nickname.trim()) {
+    if (!this.data.user_name.trim()) {
       wx.showToast({
         title: '请输入昵称',
         icon: 'none'
@@ -58,20 +59,21 @@ Page({
         console.error('请使用 2.2.3 或以上的基础库以使用云能力');
         return;
       }
+      //这个时候openid一定不是空了，因为进来的时候app.js已经初始化过了
       const openId = wx.getStorageSync('openId') || '';
       
       // 上传头像到云存储
-      let avatarUrl = this.data.avatarUrl;
+      let avatar = this.data.avatar;
       
       // 如果头像被更改过（不是默认头像且不是已有的云存储链接）
-      if (avatarUrl !== defaultAvatarUrl && !avatarUrl.includes('cloud://')) {
+      if (avatar !== defaultAvatarUrl && !avatar.includes('cloud://')) {
         wx.showLoading({ title: '上传头像中...' });
         
         // 获取临时文件路径
-        const tempFilePath = avatarUrl;
+        const tempFilePath = avatar;
         
         // 生成随机文件名
-        const cloudPath = `avatar/${openId || 'unknown'}.png`;
+        const cloudPath = `avatar/${openId || 'unknown'}_${Date.now()}.png`;
         
         // 上传图片到云存储
         const uploadRes = await wx.cloud.uploadFile({
@@ -82,7 +84,7 @@ Page({
         wx.hideLoading();
         
         if (uploadRes.fileID) {
-          avatarUrl = uploadRes.fileID;
+          avatar = uploadRes.fileID;
         } else {
           throw new Error('上传头像失败');
         }
@@ -90,8 +92,8 @@ Page({
       
       // 构建用户信息
       const userInfo = {
-        avatarUrl: avatarUrl,
-        nickName: this.data.nickname,
+        avatar: avatar,
+        user_name: this.data.user_name,
       };
       
       // 保存到本地缓存
@@ -118,14 +120,14 @@ Page({
       });
       console.log("userQuery", userQuery)
       
-      if (userQuery.data.length > 0) {
+      if (Object.keys(userQuery).length > 0) {
         // 更新现有记录
         
         const {data} = await models.user_info.update({
           data: {
-              user_name: this.data.nickname,  // 用户名称
+              user_name: this.data.user_name,  // 用户名称
               openid: openId,  // openid
-              avatar: avatarUrl,  // 头像链接
+              avatar: avatar,  // 头像链接
             },
           filter: {
             where: {
@@ -140,25 +142,44 @@ Page({
           }
         });
         console.log("更新用户信息结果", data)      
+        if (Object.keys(data).length > 0) {
+          wx.setStorageSync('loginStatus', true);
+          userInfo.user_name = this.data.user_name;
+          userInfo.avatar = avatar;
+          wx.setStorageSync('userInfo', userInfo);
+        }else{
+          //抛一个异常
+          throw new Error('自己抛出异常：更新用户信息失败');
+        }
       } else {
         // 创建新记录
         const {data} = await models.user_info.create({
           data: {
-              user_name: this.data.nickname,  // 用户名称
+              user_name: this.data.user_name,  // 用户名称
               openid: openId,  // openid
-              avatar: avatarUrl,  // 头像链接
+              avatar: avatar,  // 头像链接
+              _id: openId,
             }
         });
         console.log("创建用户信息结果", data)
+        if (Object.keys(data).length > 0) {
+          wx.setStorageSync('loginStatus', true);
+          userInfo.user_name = this.data.user_name;
+          userInfo.avatar = avatar;
+          wx.setStorageSync('userInfo', userInfo);
+        }else{
+          //抛一个异常
+          throw new Error('自己抛出异常：创建用户信息失败');
+        }
       }
       
       wx.hideLoading();
       
       // 触发用户信息更新事件
-      const eventChannel = this.getOpenerEventChannel();
-      if (eventChannel && eventChannel.emit) {
-        eventChannel.emit('userInfoUpdated', userInfo);
-      }
+      // const eventChannel = this.getOpenerEventChannel();
+      // if (eventChannel && eventChannel.emit) {
+      //   eventChannel.emit('userInfoUpdated', userInfo);
+      // }
       
       wx.showToast({
         title: '保存成功',

@@ -7,7 +7,7 @@
   <view class="avatar-section">
     <view class="section-title">头像</view>
     <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-      <image class="avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
+      <image class="avatar" src="{{avatar}}" mode="aspectFill"></image>
       <view class="avatar-hint">点击更换头像</view>
     </button>
   </view>

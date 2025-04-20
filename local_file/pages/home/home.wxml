@@ -5,8 +5,8 @@
   <!-- 用户信息区域 -->
   <view class="user-info-container">
     <view class="user-info" wx:if="{{hasUserInfo}}">
-      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
-      <view class="nickname">{{userInfo.nickName}}</view>
+      <image class="avatar" src="{{userInfo.avatar}}" mode="aspectFill"></image>
+      <view class="nickname">{{userInfo.user_name}}</view>
     </view>
     <view class="user-info-placeholder" wx:else bindtap="goToUserProfile">
       <image class="avatar" src="/images/default_avatar.png" mode="aspectFill"></image>

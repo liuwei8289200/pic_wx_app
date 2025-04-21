@@ -16,7 +16,7 @@ Page({
       short_title : options.short_title,
       title: options.title,
       isLiked: false,
-      likeCount: 10,
+      likeCount: 0,
       isCollected: false,
       collectCount: 10,
       commentCount: 10,
@@ -45,8 +45,13 @@ Page({
       const { data: likeData } = await models.media_like.list({
         filter: {
           where: {
-            image_id: this.data.image_id,
-            user_id: openId
+            image_id: {
+              $eq: this.data.image_id
+            },
+            user_id: {
+              $eq: openId
+            },
+            status: 1
           }
         }
       });
@@ -56,21 +61,52 @@ Page({
         this.setData({
           isLiked: true
         });
-      }
-      
-      // 获取图片点赞数
-      const { data: imageData } = await models.media_images.get({
-        id: this.data.image_id
-      });
-      
-      if (imageData) {
+      } else {
         this.setData({
-          likeCount: imageData.likeCount || 0,
-          commentCount: imageData.commentCount || 0
+          isLiked: false
         });
       }
+      
+      // 获取图片点赞总数 - 使用数据模型直接查询
+      const { data: likeCount } = await models.media_like.count({
+        filter: {
+          where: {
+            image_id: {
+              $eq: this.data.image_id
+            },
+            status: 1
+          }
+        }
+      });
+      
+      // 更新图片信息中的点赞数
+      await models.media_images.update({
+        id: this.data.image_id,
+        data: {
+          likeCount: likeCount.count,
+          updateTime: new Date()
+        }
+      });
+      
+      this.setData({
+        likeCount: likeCount.count || 0
+      });
     } catch (err) {
-      console.error('初始化点赞状态失败:', err);
+      // 打印错误堆栈
+      const stack = err.stack || '';
+      console.error('错误堆栈:', stack);
+      
+      // 提取错误发生的行号信息
+      const lineMatch = stack.match(/at\s+.+:(\d+):\d+/);
+      if (lineMatch && lineMatch[1]) {
+        console.error('错误发生在第 ' + lineMatch[1] + ' 行');
+      }
+      
+      // 显示错误提示给用户
+      wx.showToast({
+        title: '获取点赞信息失败',
+        icon: 'none'
+      });
     }
   },
   
@@ -99,64 +135,165 @@ Page({
       return;
     }
     
-    const isLiked = !this.data.isLiked;
-    const likeCount = this.data.likeCount + (isLiked ? 1 : -1);
+    wx.showLoading({
+      title: '',
+      mask: true
+    });
     
-    // 更新本地状态
-    this.setData({
-      isLiked,
-      likeCount
-    });  
     try {
-      if (isLiked) {
-        // 添加点赞记录
-        await models.media_like.add({
-          data: {
-            image_id: this.data.image_id,
-            user_id: openId,
-            createTime: new Date()
-          }
-        });
-        
-        // 更新图片点赞数
-        await models.media_images.update({
-          id: this.data.image_id,
-          data: {
-            likeCount: models.command.inc(1)
-          }
-        });
-      } else {
-        // 取消点赞，删除点赞记录
-        const { data: likeData } = await models.media_like.list({
-          filter: {
-            where: {
-              image_id: this.data.image_id,
-              user_id: openId
+      const isLiked = !this.data.isLiked;
+      
+      // 检查是否已存在点赞记录
+      const { data: likeData } = await models.media_like.list({
+        filter: {
+          where: {
+            image_id: {
+              $eq: this.data.image_id
+            },
+            user_id: {
+              $eq: openId
             }
           }
-        });
-        
+        }
+      });
+      
+      if (isLiked) {
+        // 点赞操作
         if (likeData.records && likeData.records.length > 0) {
-          const likeId = likeData.records[0]._id;
-          await models.media_like.remove({
-            id: likeId
-          });
-          
-          // 更新图片点赞数
-          await models.media_images.update({
-            id: this.data.image_id,
+          // 已有记录，更新状态为1
+          await models.media_like.update({
+            id: likeData.records[0]._id,
             data: {
-              likeCount: models.command.inc(-1)
+              status: 1,
+              updateTime: new Date()
+            }
+          });
+        } else {
+          // 添加点赞记录
+          await models.media_like.create({
+            data: {
+              image_id: {
+                _id: this.data.image_id
+              },
+              user_id: {
+                _id: openId
+              },
+              status: 1,
+              createTime: new Date()
             }
           });
         }
+        
+        // 更新用户的点赞列表
+        await this.updateUserLikeListModel(this.data.image_id, openId, true);
+        
+      } else {
+        // 取消点赞，更新状态为0
+        if (likeData.records && likeData.records.length > 0) {
+          await models.media_like.update({
+            id: likeData.records[0]._id,
+            data: {
+              status: 0,
+              updateTime: new Date()
+            }
+          });
+          
+          // 从用户的点赞列表中移除
+          await this.updateUserLikeListModel(this.data.image_id, openId, false);
+        }
       }
+      
+      // 重新计算图片点赞数
+      const { data: likeCount } = await models.media_like.count({
+        filter: {
+          where: {
+            image_id: {
+              $eq: this.data.image_id
+            },
+            status: 1
+          }
+        }
+      });
+      
+      // 更新图片信息中的点赞数
+      await models.media_images.update({
+        id: this.data.image_id,
+        data: {
+          likeCount: likeCount.count,
+          updateTime: new Date()
+        }
+      });
+      
+      // 更新本地状态
+      this.setData({
+        isLiked: isLiked,
+        likeCount: likeCount.count || 0
+      });
+      
+      wx.hideLoading();
     } catch (err) {
       console.error('点赞操作失败:', err);
+      wx.hideLoading();
       wx.showToast({
         title: '操作失败',
         icon: 'none'
       });
+    }
+  },
+  
+  // 使用数据模型更新用户点赞列表
+  async updateUserLikeListModel(imageId, openId, isAdd) {
+    try {
+      if (!openId) return;
+      
+      // 查询用户点赞列表
+      const { data: userLikeData } = await models.user_like_list.list({
+        filter: {
+          where: {
+            openid: openId
+          }
+        }
+      });
+      
+      if (userLikeData.records && userLikeData.records.length > 0) {
+        // 已有记录，更新
+        const currentList = userLikeData.records[0].like_pic_docid_list || '';
+        const docidList = currentList.split(',').filter(id => id.trim() !== '');
+        
+        if (isAdd) {
+          // 添加点赞
+          if (!docidList.includes(imageId)) {
+            docidList.push(imageId);
+          }
+        } else {
+          // 移除点赞
+          const index = docidList.indexOf(imageId);
+          if (index !== -1) {
+            docidList.splice(index, 1);
+          }
+        }
+        
+        // 更新记录
+        await models.user_like_list.update({
+          id: userLikeData.records[0]._id,
+          data: {
+            like_pic_docid_list: docidList.join(','),
+            updateTime: new Date()
+          }
+        });
+      } else if (isAdd) {
+        // 没有记录，且是添加操作，创建新记录
+        await models.user_like_list.create({
+          data: {
+            openid: openId,
+            like_pic_docid_list: imageId,
+            createTime: new Date(),
+            updateTime: new Date()
+          }
+        });
+      }
+    } catch (err) {
+      console.error('更新用户点赞列表失败:', err);
     }
   },
 

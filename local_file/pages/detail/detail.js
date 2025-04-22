@@ -17,6 +17,7 @@ Page({
       title: options.title,
       isLiked: false,
       likeCount: 0,
+      likeUsers: [],
       isCollected: false,
       collectCount: 10,
       commentCount: 10,
@@ -36,63 +37,34 @@ Page({
   async initLikeStatus() {
     try {
       // 检查用户登录状态
-      const loginStatus = wx.getStorageSync('loginStatus');
+      // const loginStatus = wx.getStorageSync('loginStatus');
       const openId = wx.getStorageSync('openId');
       
-      if (!loginStatus || !openId) return;
-      // 使用联合索引查询用户是否已点赞 - 索引字段顺序: image_id, user_id, status
-      const { data: likeData } = await models.media_like.get({
+      // if (!loginStatus || !openId) return;
+      // 查询点赞关联关系,获取对应图片的指定点赞用户id
+      const { data: likeData } = await models.media_image.get({
+        select: {
+          connect_image_liked_users:{
+            _id:true,
+          }
+        },
         filter: {
           where: {
-            image_id: {
+            _id: {
               $eq: this.data.image_id
-            },
-            user_id: {
-              $eq: openId
             }
           }
         },
-        // 显式声明使用索引
-        options: {
-          hint: {
-            index: 'image_user_idx'
-          }
-        }
       });
-      
+      console.log("likeData", likeData);
+      console.log("likeData.connect_image_liked_users", likeData.connect_image_liked_users);
+      // 从connect_image_liked_users查询是否有openId
+      const isLiked = likeData.connect_image_liked_users.some(user => user._id === openId);
       // 设置点赞状态
       this.setData({
-        isLiked: !!(likeData.records && likeData.records.length > 0)
-      });
-      
-      // 获取图片点赞总数 - 使用索引优化计数查询
-      const { data: likeCount } = await models.media_like.count({
-        filter: {
-          where: {
-            image_id: {
-              $eq: this.data.image_id
-            },
-            status: 1
-          }
-        },
-        options: {
-          hint: {
-            index: 'image_user_idx'
-          }
-        }
-      });
-      
-      // 更新图片信息中的点赞数
-      await models.media_images.update({
-        id: this.data.image_id,
-        data: {
-          likeCount: likeCount.count,
-          updateTime: new Date()
-        }
-      });
-      
-      this.setData({
-        likeCount: likeCount.count || 0
+        likeCount: likeData.connect_image_liked_users.length,
+        isLiked: isLiked,
+        likeUsers: likeData.connect_image_liked_users
       });
     } catch (err) {
       console.error('初始化点赞状态失败:', err);
@@ -124,110 +96,64 @@ Page({
       return;
     }
     
-    wx.showLoading({
-      title: '',
-      mask: true
-    });
+    // wx.showLoading({
+    //   title: '',
+    //   mask: true
+    // });
     
     try {
-      const isLiked = !this.data.isLiked;
+      // 替换直接修改this.data的方式
+      const newIsLiked = !this.data.isLiked;
+      const newLikeCount = this.data.likeCount + (newIsLiked ? 1 : -1);
       
-      // 使用索引查询点赞记录
-      const { data: likeData } = await models.media_like.list({
-        filter: {
-          where: {
-            image_id: {
-              $eq: this.data.image_id
-            },
-            user_id: {
-              $eq: openId
-            }
-          }
-        },
-        options: {
-          hint: {
-            index: 'image_user_idx'
-          }
-        }
-      });
-      
-      const hasRecord = likeData.records && likeData.records.length > 0;
-      
-      if (isLiked) {
-        // 点赞操作
-        if (hasRecord) {
-          // 已有记录，更新状态为1
-          await models.media_like.update({
-            id: likeData.records[0]._id,
-            data: {
-              status: 1,
-              updateTime: new Date()
-            }
-          });
-        } else {
-          // 添加点赞记录
-          await models.media_like.create({
-            data: {
-              image_id: {
-                _id: this.data.image_id
-              },
-              user_id: {
-                _id: openId
-              },
-              status: 1,
-              createTime: new Date()
-            }
-          });
-        }
-      } else {
-        // 取消点赞，更新状态为0
-        if (hasRecord) {
-          await models.media_like.update({
-            id: likeData.records[0]._id,
-            data: {
-              status: 0,
-              updateTime: new Date()
-            }
-          });
-        }
-      }
-      
-      // 使用索引重新计算图片点赞数
-      const { data: likeCount } = await models.media_like.count({
-        filter: {
-          where: {
-            image_id: {
-              $eq: this.data.image_id
-            },
-            status: 1
-          }
-        },
-        options: {
-          hint: {
-            index: 'image_user_idx'
-          }
-        }
-      });
-      
-      // 更新图片信息中的点赞数
-      await models.media_images.update({
-        id: this.data.image_id,
-        data: {
-          likeCount: likeCount.count,
-          updateTime: new Date()
-        }
-      });
-      
-      // 更新本地状态
+      // 使用setData更新状态，触发视图更新
       this.setData({
-        isLiked: isLiked,
-        likeCount: likeCount.count || 0
+        isLiked: newIsLiked,
+        likeCount: newLikeCount
       });
       
-      // 更新用户的点赞列表
-      await this.updateUserLikeListModel(this.data.image_id, openId, isLiked);
-      
-      wx.hideLoading();
+      console.log("isLiked", newIsLiked);
+      console.log("likeCount", newLikeCount);
+      if (newIsLiked) {
+        // 添加点赞关联关系
+        const { data } = await models.user_info.update({
+          data: {
+            connect_user_like_images: models.command.push({
+              _id: this.data.image_id
+            })
+          },
+          filter: {
+            where: {
+              _id: {
+                $eq: openId
+              }
+            }
+          },
+        });
+        
+        // 返回更新成功的条数
+        console.log(data);
+      } else {
+        // 移除点赞关联关系
+        const { data } = await models.user_info.update({
+          data: {
+            connect_user_like_images: models.command.pull({
+              _id: this.data.image_id
+            })
+          },
+          filter: {
+            where: {
+              _id: {
+                $eq: openId
+              } 
+            }
+          },
+        });
+        
+        // 返回更新成功的条数
+        console.log(data);  
+      }
+
     } catch (err) {
       console.error('点赞操作失败:', err);
       wx.hideLoading();

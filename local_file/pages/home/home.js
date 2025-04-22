@@ -146,24 +146,51 @@ Page({
         
         // 为每个图片获取点赞数
         const imageIds = imageList.map(item => item._id);
-        const likeCountsPromises = imageIds.map(id => 
-          models.media_like.count({
-            filter: {
-              where: {
-                image_id: { $eq: id },
-                status: 1
-              }
-            }
-          })
-        );
         
-        // 等待所有点赞数查询完成
-        const likeCountsResults = await Promise.all(likeCountsPromises);
+        // 使用批量查询优化性能
+        const batchPromises = [];
+        const batchSize = 20; // 每批次处理的图片数量
+        
+        for (let i = 0; i < imageIds.length; i += batchSize) {
+          const batchIds = imageIds.slice(i, i + batchSize);
+          
+          // 为每批次创建一个查询
+          batchPromises.push(
+            models.media_like.aggregate({
+              pipeline: [
+                {
+                  $match: {
+                    image_id: { $in: batchIds },
+                    status: 1
+                  }
+                },
+                {
+                  $group: {
+                    _id: "$image_id", 
+                    count: { $sum: 1 }
+                  }
+                }
+              ],
+              options: {
+                hint: {
+                  index: 'image_user_idx'
+                }
+              }
+            })
+          );
+        }
+        
+        // 等待所有批次查询完成
+        const batchResults = await Promise.all(batchPromises);
         
         // 构建点赞数映射
         const likeCounts = {};
-        imageIds.forEach((id, index) => {
-          likeCounts[id] = likeCountsResults[index].data.count || 0;
+        // 合并所有批次的结果
+        batchResults.forEach(result => {
+          const records = result.data.list || [];
+          records.forEach(record => {
+            likeCounts[record._id] = record.count;
+          });
         });
         
         // 构建图片列表
@@ -271,5 +298,32 @@ Page({
       title: '我的收藏',
       path: '/pages/index/index'
     };
-  }
+  },
+
+  // 创建数据库索引 - 仅在开发环境使用
+  createDatabaseIndex() {
+    wx.showLoading({
+      title: '创建索引中...',
+      mask: true
+    });
+    
+    wx.cloud.callFunction({
+      name: 'createMediaLikeIndex',
+      data: {}
+    }).then(res => {
+      wx.hideLoading();
+      console.log('创建索引结果:', res);
+      wx.showToast({
+        title: '索引创建成功',
+        icon: 'success'
+      });
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('创建索引失败:', err);
+      wx.showToast({
+        title: '索引创建失败',
+        icon: 'none'
+      });
+    });
+  },
 })

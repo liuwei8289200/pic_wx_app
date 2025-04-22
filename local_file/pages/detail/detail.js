@@ -40,95 +40,32 @@ Page({
       const openId = wx.getStorageSync('openId');
       
       if (!loginStatus || !openId) return;
-      // const {data: test} = await models.image_info.get({
-      //   filter: {
-      //     where: {
-      //       $and: [
-      //         {
-      //           _id: {
-      //             $eq: 'e832569468066c1201d0a8d15367dd52', // 推荐传入_id数据标识进行操作
-      //           },
-      //         },
-      //       ]
-      //     }
-      //   },
-      // });
-      // console.log("test", test);
-
-      // const { data: imageData } = await models.image_info.list({
-      //   select: {
-      //     image_comment:true,
-      //   },
-      //   filter: {
-      //     where: {
-      //       _id: {    // 关联模型标识
-      //         $eq: 'e832569468066c1201d0a8d15367dd52', // 传入数据 ID
-      //       }
-      //     }
-      //   },
-      // });
-      // console.log("imageData", imageData);
-
-      // 显式的选择关联模型
-      // const { data: imageData } = await models.media_image.list({
-      //     select: {
-      //       comment_ping_image:true,
-      //     },
-      //     filter: {
-      //       where: {
-      //         _id: {    // 关联模型标识
-      //           $eq: this.data.image_id, // 传入数据 ID
-      //         }
-      //       }
-      //     },
-      //   });
-
-      // 通过关联模型做二级查询
-       const { data: imageData } = await models.media_image.list({
-          select: {
-            comment_ping_image:true,
-          },
-          filter: {
-            relateWhere: {
-              media_like: {  
-                where: {
-                  _id: {
-                    $eq: 'BA1U6QER601',
-                  }
-                }  // 关联模型标识
-                }
-              }
-          },
-        });
-        console.log("imageData", imageData);
-        
-      // 查询当前用户是否已点赞
+      // 使用联合索引查询用户是否已点赞 - 索引字段顺序: image_id, user_id, status
       const { data: likeData } = await models.media_like.get({
         filter: {
           where: {
-            image_id: {    // 关联模型标识
-              $eq: this.data.image_id, // 传入数据 ID
+            image_id: {
+              $eq: this.data.image_id
             },
             user_id: {
-              $eq: openId,
-            },
+              $eq: openId
+            }
           }
         },
+        // 显式声明使用索引
+        options: {
+          hint: {
+            index: 'image_user_idx'
+          }
+        }
       });
-      console.log("likeData", likeData);
       
-      if (Object.keys(likeData).length > 0) {
-        // 用户已点赞
-        this.setData({
-          isLiked: true
-        });
-      } else {
-        this.setData({
-          isLiked: false
-        });
-      }
+      // 设置点赞状态
+      this.setData({
+        isLiked: !!(likeData.records && likeData.records.length > 0)
+      });
       
-      // 获取图片点赞总数 - 使用数据模型直接查询
+      // 获取图片点赞总数 - 使用索引优化计数查询
       const { data: likeCount } = await models.media_like.count({
         filter: {
           where: {
@@ -136,6 +73,11 @@ Page({
               $eq: this.data.image_id
             },
             status: 1
+          }
+        },
+        options: {
+          hint: {
+            index: 'image_user_idx'
           }
         }
       });
@@ -153,14 +95,7 @@ Page({
         likeCount: likeCount.count || 0
       });
     } catch (err) {
-      // 打印错误堆栈
-      const stack = err.stack || '';
-      console.error('错误堆栈:', stack);
-      // 显示错误提示给用户
-      wx.showToast({
-        title: '获取点赞信息失败',
-        icon: 'none'
-      });
+      console.error('初始化点赞状态失败:', err);
     }
   },
   
@@ -197,8 +132,8 @@ Page({
     try {
       const isLiked = !this.data.isLiked;
       
-      // 检查是否已存在点赞记录
-      const { data: likeData } = await models.media_like.get({
+      // 使用索引查询点赞记录
+      const { data: likeData } = await models.media_like.list({
         filter: {
           where: {
             image_id: {
@@ -208,12 +143,19 @@ Page({
               $eq: openId
             }
           }
+        },
+        options: {
+          hint: {
+            index: 'image_user_idx'
+          }
         }
       });
-      console.log("likeData", likeData);
+      
+      const hasRecord = likeData.records && likeData.records.length > 0;
+      
       if (isLiked) {
         // 点赞操作
-        if (likeData.records && likeData.records.length > 0) {
+        if (hasRecord) {
           // 已有记录，更新状态为1
           await models.media_like.update({
             id: likeData.records[0]._id,
@@ -237,11 +179,9 @@ Page({
             }
           });
         }
-        
-        
       } else {
         // 取消点赞，更新状态为0
-        if (likeData.records && likeData.records.length > 0) {
+        if (hasRecord) {
           await models.media_like.update({
             id: likeData.records[0]._id,
             data: {
@@ -252,7 +192,7 @@ Page({
         }
       }
       
-      // 重新计算图片点赞数
+      // 使用索引重新计算图片点赞数
       const { data: likeCount } = await models.media_like.count({
         filter: {
           where: {
@@ -260,6 +200,11 @@ Page({
               $eq: this.data.image_id
             },
             status: 1
+          }
+        },
+        options: {
+          hint: {
+            index: 'image_user_idx'
           }
         }
       });
@@ -278,6 +223,9 @@ Page({
         isLiked: isLiked,
         likeCount: likeCount.count || 0
       });
+      
+      // 更新用户的点赞列表
+      await this.updateUserLikeListModel(this.data.image_id, openId, isLiked);
       
       wx.hideLoading();
     } catch (err) {

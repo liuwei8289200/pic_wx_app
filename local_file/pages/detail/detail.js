@@ -96,11 +96,6 @@ Page({
       return;
     }
     
-    // wx.showLoading({
-    //   title: '',
-    //   mask: true
-    // });
-    
     try {
       // 替换直接修改this.data的方式
       const newIsLiked = !this.data.isLiked;
@@ -115,26 +110,20 @@ Page({
       console.log("isLiked", newIsLiked);
       console.log("likeCount", newLikeCount);
       if (newIsLiked) {
-        // 添加点赞关联关系
-        const { data } = await models.user_info.update({
+        const { data } = await models.user_info.update({  
           data: {
-            connect_user_like_images: models.command.push({
-              _id: this.data.image_id
-            })
+            connect_user_like_images:[{$addToSet:this.data.image_id}]
           },
           filter: {
             where: {
               _id: {
                 $eq: openId
-              }
+              } 
             }
           },
-        });
-        
-        // 返回更新成功的条数
+        })
         console.log(data);
       } else {
-        // 移除点赞关联关系
         const { data } = await models.user_info.update({
           data: {
             connect_user_like_images: models.command.pull({

@@ -110,37 +110,32 @@ Page({
       console.log("isLiked", newIsLiked);
       console.log("likeCount", newLikeCount);
       if (newIsLiked) {
-        const { data } = await models.user_info.update({  
+        //调用云函数
+        this.data.likeUsers.push({_id:openId});
+        const { resp } = await wx.cloud.callFunction({
+          name: 'dataModelUpdate',
           data: {
-            connect_user_like_images:[{$addToSet:this.data.image_id}]
-          },
-          filter: {
-            where: {
-              _id: {
-                $eq: openId
-              } 
+            action: 'updateImageLikedUser',
+            data: {
+              object_id: this.data.image_id,
+              update_list: this.data.likeUsers
             }
-          },
-        })
-        console.log(data);
-      } else {
-        const { data } = await models.user_info.update({
-          data: {
-            connect_user_like_images: models.command.pull({
-              _id: this.data.image_id
-            })
-          },
-          filter: {
-            where: {
-              _id: {
-                $eq: openId
-              } 
-            }
-          },
+          }
         });
-        
-        // 返回更新成功的条数
-        console.log(data);  
+        console.log(resp);
+      } else {
+        this.data.likeUsers = this.data.likeUsers.filter(user => user._id !== openId);  
+        const { resp } = await wx.cloud.callFunction({
+          name: 'dataModelUpdate',
+          data: {
+            action: 'updateImageLikedUser',
+            data: {
+              object_id: this.data.image_id,
+              update_list: this.data.likeUsers
+            }
+          }
+        }); 
+        console.log(resp);  
       }
 
     } catch (err) {

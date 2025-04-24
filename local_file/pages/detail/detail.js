@@ -45,7 +45,7 @@ Page({
       isLiked: options.isLiked === 'true',
       isLoading: true
     };
-    
+    console.log("initialData", initialData);
     this.setData(initialData);
     
     // 并行加载所有数据
@@ -157,6 +157,7 @@ Page({
             }
           }
         });
+        console.log("resp", resp);
       } else {
         const updatedLikeUsers = this.data.likeUsers.filter(user => user._id !== openId);
         this.setData({
@@ -173,6 +174,7 @@ Page({
             }
           }
         }); 
+        console.log("resp", resp);
       }
 
     } catch (err) {

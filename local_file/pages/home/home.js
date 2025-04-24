@@ -2,6 +2,9 @@
 import { installRouteBuilder } from '../index/route'
 import { compareVersion, generateGridListNew, getPicListByDocidList } from '../index/utils'
 const { screenWidth } = wx.getSystemInfoSync()
+const { init } = require("@cloudbase/wx-cloud-client-sdk");
+const client = init(wx.cloud)
+const models = client.models
 Page({
 
   /**
@@ -78,7 +81,7 @@ Page({
     });
   },
 
-  loadGridList() {
+  async loadGridList() {
     const imageRatio = [
       {
         width: 1,
@@ -99,136 +102,60 @@ Page({
     wx.showLoading({
       title: '加载中...',
       mask: true
-    });
-
-    // 使用数据模型获取用户点赞列表
-    const app = getApp();
-    const { models } = app.cloudClient;
-    
+    });    
     // 获取用户点赞列表
-    models.user_like_list.list({
+    const { data: likeImagesData } = await models.user_info.get({
+      select: {
+        connect_user_like_images:true
+      },
       filter: {
         where: {
-          openid: openid
+          _id: {
+            $eq: openid
+          }
         }
-      }
-    }).then(async (userLikeResult) => {
-      const userLikeData = userLikeResult.data;
-      
-      // 判断结果是否为空
-      if (!userLikeData || !userLikeData.records || userLikeData.records.length === 0) {
-        this.setData({ gridList: [] });
-        wx.hideLoading();
-        return;
-      }
-      
-      const docidList = userLikeData.records[0].like_pic_docid_list;
-      
-      // 判断点赞列表是否有效
-      if (!docidList || docidList.trim() === '') {
-        this.setData({ gridList: [] });
-        wx.hideLoading();
-        return;
-      }
-      
-      // 解析图片ID列表
-      const docidArray = docidList.split(',').map(id => id.trim()).filter(id => id !== '');
-      
-      if (docidArray.length === 0) {
-        this.setData({ gridList: [] });
-        wx.hideLoading();
-        return;
-      }
-      
-      try {
-        // 获取图片详情
-        const imageList = await getPicListByDocidList(docidArray);
-        
-        // 为每个图片获取点赞数
-        const imageIds = imageList.map(item => item._id);
-        
-        // 使用批量查询优化性能
-        const batchPromises = [];
-        const batchSize = 20; // 每批次处理的图片数量
-        
-        for (let i = 0; i < imageIds.length; i += batchSize) {
-          const batchIds = imageIds.slice(i, i + batchSize);
-          
-          // 为每批次创建一个查询
-          batchPromises.push(
-            models.media_like.aggregate({
-              pipeline: [
-                {
-                  $match: {
-                    image_id: { $in: batchIds },
-                    status: 1
-                  }
-                },
-                {
-                  $group: {
-                    _id: "$image_id", 
-                    count: { $sum: 1 }
-                  }
-                }
-              ],
-              options: {
-                hint: {
-                  index: 'image_user_idx'
-                }
-              }
-            })
-          );
-        }
-        
-        // 等待所有批次查询完成
-        const batchResults = await Promise.all(batchPromises);
-        
-        // 构建点赞数映射
-        const likeCounts = {};
-        // 合并所有批次的结果
-        batchResults.forEach(result => {
-          const records = result.data.list || [];
-          records.forEach(record => {
-            likeCounts[record._id] = record.count;
-          });
-        });
-        
-        // 构建图片列表
-        imageList.forEach(item => {
-          const ratioIdx = Math.floor(Math.random() * imageRatio.length);
-          const ratio = imageRatio[ratioIdx];
-          const url = `https://6d69-mini-program-7gugok6cdb014aba-1258427370.tcb.qcloud.la/grid_images/${item.file_id}`;
-          const short_title = item.title.split('：')[0];
-          
-          // 使用查询到的点赞数
-          const likeCount = likeCounts[item._id] !== undefined 
-            ? likeCounts[item._id] 
-            : (item.likeCount || 0);
-          
-          ans.push({
-            id: ans.length,
-            docid: item._id,
-            ...ratio,
-            src: url,
-            like: likeCount,
-            content: item.desc,
-            title: item.title,
-            short_title: short_title,
-          });
-        });
-        
-        this.setData({ gridList: ans });
-      } catch (error) {
-        console.error('获取图片或点赞数据失败:', error);
-        this.setData({ gridList: [] });
-      } finally {
-        wx.hideLoading();
-      }
-    }).catch(error => {
-      console.error('获取用户点赞列表失败:', error);
-      this.setData({ gridList: [] });
-      wx.hideLoading();
+      },
     });
+    console.log("likeImagesData", likeImagesData);
+    const likeImages = likeImagesData.connect_user_like_images;
+    //将图片添加到gridList中
+    if (!likeImages || likeImages.length === 0) {
+      this.setData({
+        gridList: []
+      });
+      wx.hideLoading();
+      return;
+    }
+    
+    // 遍历用户点赞的图片列表
+    for (let i = 0; i < likeImages.length; i++) {
+      const image = likeImages[i];
+
+      const ratioIdx = Math.floor(Math.random() * imageRatio.length)
+      const ratio = imageRatio[ratioIdx]
+      const url = `https://6d69-mini-program-7gugok6cdb014aba-1258427370.tcb.qcloud.la/grid_images/${image.file_id}`;
+          
+      // 构建图片对象添加到gridList
+      const short_title = image.title.split('：')[0];
+      ans.push({
+        // id 是自增序号
+        id: ans.length,
+        docid: image._id,
+        ...ratio,
+        src: url,
+        like: image.like_num,
+        content: image.description,
+        title: image.title,
+        short_title: short_title,
+      });
+    }
+    
+    this.setData({
+      gridList: ans
+    });
+    console.log("gridList", this.data.gridList);
+    
+    wx.hideLoading();
   },
 
   navigateTo(e) {

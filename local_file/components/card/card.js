@@ -182,7 +182,7 @@ Component({
       }
       
       const urlContent = `../../pages/detail/detail?index=${index}&url=${url}&content=${content}&ratio=${ratio}&title=${title}&short_title=${short_title}&image_id=${docid}&likeCount=${likeCount}&isLiked=${isLiked}`
-      
+      console.log("urlContent", urlContent);
       wx.navigateTo({
         url: urlContent,
         //routeType: 'CardScaleTransition',

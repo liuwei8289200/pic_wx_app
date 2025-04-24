@@ -5,42 +5,71 @@ const client = init(wx.cloud)
 const models = client.models
 
 Page({
+  data: {
+    // 初始化基础数据
+    image_id: '',
+    content: '',
+    ratio: 1,
+    swiperHeight: 0,
+    url: '',
+    short_title: '',
+    title: '',
+    // 点赞相关
+    isLiked: false,
+    likeCount: 0,
+    likeUsers: [],
+    // 收藏相关
+    isCollected: false,
+    collectCount: 10,
+    // 评论相关
+    commentCount: 0,
+    showCommentInput: false,
+    commentText: '',
+    comments: [],
+    // 加载状态
+    isLoading: true
+  },
+
   onLoad(options) {
     // 处理传入的参数
-    this.setData({
+    const initialData = {
       image_id: options.image_id,
       content: options.content,
       ratio: options.ratio,
       swiperHeight: screenWidth / options.ratio,
       url: options.url,
-      short_title : options.short_title,
+      short_title: options.short_title,
       title: options.title,
-      isLiked: false,
-      likeCount: 0,
-      likeUsers: [],
-      isCollected: false,
-      collectCount: 10,
-      commentCount: 10,
-      showCommentInput: false,
-      commentText: '',
-      comments: []
+      // 如果从列表页传递了点赞信息，直接使用
+      likeCount: options.likeCount ? parseInt(options.likeCount) : 0,
+      isLiked: options.isLiked === 'true',
+      isLoading: true
+    };
+    
+    this.setData(initialData);
+    
+    // 并行加载所有数据
+    Promise.all([
+      this.initLikeStatus(),
+      this.loadComments()
+    ]).then(() => {
+      this.setData({
+        isLoading: false
+      });
+    }).catch(err => {
+      console.error('数据加载失败:', err);
+      this.setData({
+        isLoading: false
+      });
     });
-    
-    // 加载评论列表
-    this.loadComments();
-    
-    // 初始化点赞状态
-    this.initLikeStatus();
   },
   
   // 初始化点赞状态
   async initLikeStatus() {
     try {
-      // 检查用户登录状态
-      // const loginStatus = wx.getStorageSync('loginStatus');
       const openId = wx.getStorageSync('openId');
+      if (!openId) return;
       
-      // if (!loginStatus || !openId) return;
       // 查询点赞关联关系,获取对应图片的指定点赞用户id
       const { data: likeData } = await models.media_image.get({
         select: {
@@ -56,10 +85,14 @@ Page({
           }
         },
       });
-      console.log("likeData", likeData);
-      console.log("likeData.connect_image_liked_users", likeData.connect_image_liked_users);
+      
+      if (!likeData || !likeData.connect_image_liked_users) {
+        return;
+      }
+      
       // 从connect_image_liked_users查询是否有openId
       const isLiked = likeData.connect_image_liked_users.some(user => user._id === openId);
+      
       // 设置点赞状态
       this.setData({
         likeCount: likeData.connect_image_liked_users.length,
@@ -107,40 +140,49 @@ Page({
         likeCount: newLikeCount
       });
       
-      console.log("isLiked", newIsLiked);
-      console.log("likeCount", newLikeCount);
       if (newIsLiked) {
         //调用云函数
-        this.data.likeUsers.push({_id:openId});
+        const updatedLikeUsers = [...this.data.likeUsers, {_id: openId}];
+        this.setData({
+          likeUsers: updatedLikeUsers
+        });
+        
         const { resp } = await wx.cloud.callFunction({
           name: 'dataModelUpdate',
           data: {
             action: 'updateImageLikedUser',
             data: {
               object_id: this.data.image_id,
-              update_list: this.data.likeUsers
+              update_list: updatedLikeUsers
             }
           }
         });
-        console.log(resp);
       } else {
-        this.data.likeUsers = this.data.likeUsers.filter(user => user._id !== openId);  
+        const updatedLikeUsers = this.data.likeUsers.filter(user => user._id !== openId);
+        this.setData({
+          likeUsers: updatedLikeUsers
+        });
+        
         const { resp } = await wx.cloud.callFunction({
           name: 'dataModelUpdate',
           data: {
             action: 'updateImageLikedUser',
             data: {
               object_id: this.data.image_id,
-              update_list: this.data.likeUsers
+              update_list: updatedLikeUsers
             }
           }
         }); 
-        console.log(resp);  
       }
 
     } catch (err) {
       console.error('点赞操作失败:', err);
-      wx.hideLoading();
+      // 发生错误时，回滚UI状态
+      this.setData({
+        isLiked: !this.data.isLiked,
+        likeCount: this.data.likeCount + (this.data.isLiked ? 1 : -1)
+      });
+      
       wx.showToast({
         title: '操作失败',
         icon: 'none'
@@ -374,8 +416,6 @@ Page({
 
   // 加载评论列表
   async loadComments() {
-    console.log("loadComments")
-    console.log("this.data.image_id", this.data.image_id)
     try {
       // 查询当前图片的所有评论，按时间倒序排列
       const { data } = await models.media_comment.list({

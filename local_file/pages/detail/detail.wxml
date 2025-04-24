@@ -62,19 +62,21 @@
 
 					<!-- 右侧按钮组 -->
 					<view class="right-actions">
-						<view class="action-group tmp-a" bindtap="handleLike">
+						<!-- 点赞按钮 - 加载中显示骨架屏 -->
+						<view class="action-group tmp-a" bindtap="{{!isLoading ? 'handleLike' : ''}}">
 							<view class="action-btn">
 								<view class="action-btn-inner">
-									<image class="action-icon" src="{{isLiked ? '/images/icon_like_active.png' : '/images/icon_like.png'}}"></image>
-									<text class="action-text">{{likeCount}}</text>
+									<image class="action-icon" src="{{isLoading ? '/images/icon_like.png' : (isLiked ? '/images/icon_like_active.png' : '/images/icon_like.png')}}"></image>
+									<text class="action-text {{isLoading ? 'skeleton skeleton-text' : ''}}">{{isLoading ? '' : likeCount}}</text>
 								</view>
 							</view>
 						</view>
-						<view class="action-group" catchtap="showCommentInput">
+						<!-- 评论按钮 - 加载中也显示骨架屏 -->
+						<view class="action-group" catchtap="{{!isLoading ? 'showCommentInput' : ''}}">
 							<view class="action-btn">
 								<view class="action-btn-inner">
 									<image class="action-icon" src="/images/icon_comment.png"></image>
-									<text class="action-text">{{commentCount}}</text>
+									<text class="action-text {{isLoading ? 'skeleton skeleton-text' : ''}}">{{isLoading ? '' : commentCount}}</text>
 								</view>
 							</view>
 						</view>

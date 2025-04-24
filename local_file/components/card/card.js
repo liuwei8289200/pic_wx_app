@@ -169,9 +169,20 @@ Component({
     },
     navigateTo(e) {
       const { index, url, content, ratio, title, short_title, docid } = e.currentTarget.dataset
-      console.log("test111111", e.currentTarget.dataset)
-      const urlContent = `../../pages/detail/detail?index=${index}&url=${url}&content=${content}&ratio=${ratio}&title=${title}&short_title=${short_title}&image_id=${docid}`
-      console.log("test22222222", urlContent)
+      const item = this.data.item || {};
+      const likeCount = item.like || 0;
+      
+      // 查询当前登录用户是否已点赞
+      const openId = wx.getStorageSync('openId');
+      let isLiked = false;
+      
+      // 如果能获取到点赞状态则传入，否则在详情页重新获取
+      if (item.likedUsers && Array.isArray(item.likedUsers)) {
+        isLiked = item.likedUsers.some(user => user._id === openId);
+      }
+      
+      const urlContent = `../../pages/detail/detail?index=${index}&url=${url}&content=${content}&ratio=${ratio}&title=${title}&short_title=${short_title}&image_id=${docid}&likeCount=${likeCount}&isLiked=${isLiked}`
+      
       wx.navigateTo({
         url: urlContent,
         //routeType: 'CardScaleTransition',

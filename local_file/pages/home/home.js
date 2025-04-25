@@ -154,10 +154,10 @@ Page({
         docid: image._id,
         ...ratio,
         src: url,
-        like: image.like_num,
         content: image.description,
         title: image.title,
         short_title: short_title,
+        foot_is_show:false,
       });
     }
     

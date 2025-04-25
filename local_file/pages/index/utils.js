@@ -92,18 +92,119 @@ const imageList = [
 const { init } = require("@cloudbase/wx-cloud-client-sdk");
 const client = init(wx.cloud)
 const models = client.models
-export const getModelsGridImages = async (pageNumber, pageSize) => {
-  console.log("enter in getModelsGridImages")
-  console.log("PageNumber is ", pageNumber)
-  console.log("PageSize is ", pageSize)
+
+// 获取图片总数的函数
+export const getTotalImagesCount = async () => {
+  console.log("获取图片总数")
+  
   const { data } = await models.media_image.list({
     filter: {
       where: {}
+    },
+    pageSize: 1, // 只需要获取总数，所以页面大小设为最小
+    pageNumber: 1,
+    getCount: true, // 开启用来获取总数
+  });
+  
+  console.log("图片总数:", data.total);
+  return data.total;
+}
+
+// 根据图片总数和pageSize生成随机页码
+export const getRandomPageNumber = (totalCount, pageSize) => {
+  if (!totalCount || !pageSize || totalCount <= 0 || pageSize <= 0) {
+    return 1;
+  }
+  
+  // 计算最大页码
+  const maxPageNumber = Math.ceil(totalCount / pageSize);
+  // 生成1到maxPageNumber之间的随机整数
+  const randomPageNumber = Math.floor(Math.random() * maxPageNumber) + 1;
+  
+  console.log("总页数:", maxPageNumber);
+  console.log("随机页码:", randomPageNumber);
+  
+  return randomPageNumber;
+}
+
+// 记录已使用过的页码
+const usedPageNumbers = new Set();
+
+// 获取未使用过的下一个页码
+export const getNextUnusedPageNumber = (totalCount, pageSize, currentPageNumber) => {
+  if (!totalCount || !pageSize || totalCount <= 0 || pageSize <= 0) {
+    return 1;
+  }
+  
+  // 记录当前页码为已使用
+  usedPageNumbers.add(currentPageNumber);
+  
+  // 计算最大页码
+  const maxPageNumber = Math.ceil(totalCount / pageSize);
+  
+  // 如果所有页码都已使用，则重置已使用页码集合
+  if (usedPageNumbers.size >= maxPageNumber) {
+    usedPageNumbers.clear();
+    usedPageNumbers.add(currentPageNumber);
+  }
+  
+  // 查找未使用过的页码
+  let nextPageNumber = currentPageNumber + 1;
+  if (nextPageNumber > maxPageNumber) {
+    nextPageNumber = 1; // 如果超过最大页码，则回到第一页
+  }
+  
+  // 如果下一个页码已经使用过，则继续查找
+  while (usedPageNumbers.has(nextPageNumber)) {
+    nextPageNumber++;
+    if (nextPageNumber > maxPageNumber) {
+      nextPageNumber = 1;
+    }
+  }
+  
+  // 标记为已使用
+  usedPageNumbers.add(nextPageNumber);
+  
+  console.log("下一个未使用页码:", nextPageNumber);
+  return nextPageNumber;
+}
+
+export const getModelsGridImages = async (pageNumber, pageSize, randomSeed) => {
+  // 固定调试使用
+  // pageNumber = 1
+  // pageSize = 20
+  console.log("enter in getModelsGridImages")
+  console.log("PageNumber is ", pageNumber)
+  console.log("PageSize is ", pageSize)
+  console.log("RandomSeed is ", randomSeed)
+  
+  const { data } = await models.media_image.list({
+    filter: {
+      where: {}
+    },
+    select: {
+      connect_image_liked_users:{
+        _id:true,
+      },
+      $master:true
     },
     pageSize: pageSize, // 分页大小，建议指定，如需设置为其它值，需要和 pageNumber 配合使用，两者同时指定才会生效
     pageNumber: pageNumber, // 第几页
     getCount: true, // 开启用来获取总数
   });
+  // const sql = `SELECT * FROM media_image ORDER BY RAND(${randomSeed}) LIMIT ${pageSize} OFFSET ${(pageNumber - 1) * pageSize}`
+  // console.log("sql is ", sql)
+  // // 使用randomSeed作为随机排序的种子
+  // const { test } = await wx.cloud.callFunction({
+  //   name: 'runRawSQL',
+  //   data: {
+  //     action: 'runRawSQL',
+  //     data: {
+  //       sql: sql
+  //     }
+  //   }
+  // });
+  
   console.log("getModelsGridImages", data);
   const ans = [];
   data.records.forEach(item => {
@@ -121,10 +222,11 @@ export const getModelsGridImages = async (pageNumber, pageSize) => {
       docid: item._id,
       ...ratio,
       src: url,
-      like: item.like_num,
+      like_users: item.connect_image_liked_users,
       content: item.description,
       title: item.title,
       short_title: short_title,
+      foot_is_show:true,
     });
     console.log("ans", ans);
   });

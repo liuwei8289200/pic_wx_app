@@ -4,6 +4,11 @@
   <!-- <input class="search" placeholder="搜索"/> -->
   <image class="logo" src="../../images/logo.png" mode="aspectFit" />
   <!-- <button class="help">帮助</button> -->
+   <!-- <view class="refresh-btn" bindtap="refreshImages">
+    <text class="refresh-icon">🔄</text>
+    <text>随机刷新</text>
+  </view>
+  -->
 </view>
 
 <swiper class="swiper" autoplay="true" interval="3000" indicator-dots="true" indicator-active-color="#4682b4">

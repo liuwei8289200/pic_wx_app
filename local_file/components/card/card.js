@@ -23,6 +23,12 @@ Component({
       value: 0
     },
   },
+  data: {
+    isLiked: false,
+    likeCount: 0,
+    likeUsers: [],
+  },
+
   lifetimes: {
     created() {
       this.scale = shared(1)
@@ -40,6 +46,7 @@ Component({
       })()
     },
     attached() {
+      this.initLikeStatus()
       this.applyAnimatedStyle(
         '.card_wrap', 
         () => {
@@ -90,82 +97,130 @@ Component({
   },
 
   methods: {
-    likeImage(event) {
-      const { docid } = event.currentTarget.dataset
+    initLikeStatus() {
+      const openId = wx.getStorageSync('openId');
+      const item = this.data.item || {};
+      console.log("item is", item);
+      // 检查connect_image_liked_users是否存在且是数组
+      if (item.like_users && Array.isArray(item.like_users)) {
+        // 获取点赞列表
+        const likeUsers = item.like_users;
+        // 判断当前用户是否已点赞
+        const isLiked = likeUsers.some(user => user._id === openId);
+        // 获取点赞数量
+        const likeCount = likeUsers.length;
+        
+        // 更新数据状态
+        this.setData({
+          isLiked: isLiked,
+          likeCount: likeCount,
+          likeUsers: likeUsers
+        });
+        
+        console.log(`图片${item.docid}初始化点赞状态: 已点赞=${isLiked}, 点赞数=${likeCount}`);
+      } else {
+        // 如果没有点赞数据，设置默认值
+        this.setData({
+          isLiked: false,
+          likeCount: 0,
+          likeUsers: []
+        });
+        
+        console.log(`图片${item.docid || '未知'}初始化点赞状态: 无点赞数据`);
+      }
+    },
+    // 判断当前用户是否已点赞
+    isUserLiked() {
+      const openId = wx.getStorageSync('openId');
+      const item = this.data.item || {};
+      console.log("item is", item);
+      
+      // 检查connect_image_liked_users是否存在且是数组
+      if (item.connect_image_liked_users && Array.isArray(item.connect_image_liked_users)) {
+        // 检查用户是否在点赞列表中
+        return item.connect_image_liked_users.some(user => user._id === openId);
+      }
+      
+      return false;
+    },
+    
+    async likeImage(event) {
+      const { docid, likeusers } = event.currentTarget.dataset
       console.log("doc_id is", docid);
-
-
-      // 更新点赞数字
-      const tmp_num = this.data.item.like + 1;
-      this.setData({
-        'item.like': tmp_num // 立即更新点赞数
-      });
-      wx.cloud.callFunction({
-        name: 'dbCommand',
-        data: {
-          action: 'updateLikeNum',
-          data: {
-            docid: docid,
-          }
-        },
-        success: res => {
-          console.log('云函数updateLikeNum调用成功：', res.result);
-        },
-        fail: err => {
-          console.error('云函数调用失败：', err);
+      
+      // 获取当前用户是否已点赞
+      const openId = wx.getStorageSync('openId');
+      
+      if (!openId) {
+        wx.showToast({
+          title: '请先登录',
+          icon: 'none'
+        });
+        return;
+      }
+      try {
+        
+        const newIsLiked = !this.data.isLiked;
+        const newLikeCount = this.data.likeCount + (newIsLiked ? 1 : -1);
+        
+        // 使用setData更新状态，触发视图更新
+        this.setData({
+          isLiked: newIsLiked,
+          likeCount: newLikeCount
+        });
+        
+        if (newIsLiked) {
+          //调用云函数
+          //取出
+          const updatedLikeUsers = [...this.data.likeUsers, {_id: openId}];
+          this.setData({
+            likeUsers: updatedLikeUsers
+          });
+          
+          const { resp } = await wx.cloud.callFunction({
+            name: 'dataModelUpdate',
+            data: {
+              action: 'updateImageLikedUser',
+              data: {
+                object_id: docid,
+                update_list: updatedLikeUsers
+              }
+            }
+          });
+          console.log("resp", resp);
+        } else {
+          const updatedLikeUsers = this.data.likeUsers.filter(user => user._id !== openId);
+          this.setData({
+            likeUsers: updatedLikeUsers
+          });
+          
+          const { resp } = await wx.cloud.callFunction({
+            name: 'dataModelUpdate',
+            data: {
+              action: 'updateImageLikedUser',
+              data: {
+                object_id: docid,
+                update_list: updatedLikeUsers
+              }
+            }
+          }); 
+          console.log("resp", resp);
         }
-      });
-      // 获取openid
-      const openid = wx.getStorageSync('openId');
-      // 异步写入数据库
-      wx.cloud.callFunction({
-        name: 'dbCommand',
-        data: {
-          action: 'updateLikeListByOpenId',
-          data: {
-            openid: openid,
-            docid: docid
-          }
-        },
-        success: res => {
-          console.log('云函数updateLikeListByOpenId调用成功：', res);
-        },
-        fail: err => {
-          console.error('云函数调用失败：', err);
-        }
-      });
-
-      // wx.cloud.database().collection('likes').add({
-      //   data: {
-      //     imageUrl: imageUrl,
-      //     userId: wx.getStorageSync('userId') // 假设用户ID存储在本地
-      //   },
-      //   success: res => {
-      //     console.log('点赞成功:', res);
-      //   },
-      //   fail: err => {
-      //     console.error('点赞失败:', err);
-      //   }
-      // });
-      // wx.cloud.database().collection('pic_list').get({
-      //   success: function(res) {
-      //     // res.data 是一个包含集合中有权限访问的所有记录的数据，不超过 20 条
-      //     console.log("res.data", res.data)
-      //   }
-      // })
-      // wx.cloud.database().collection('pic_list').doc('a56e23cd67c445520037fc6d7f232cb8').update({
-      //   // data 传入需要局部更新的数据
-      //   data: {
-      //     // 表示将 done 字段置为 true
-      //     like_num: tmp_num
-      //   },
-      //   success: res => {
-      //     console.log('点赞数更新成功:', res);
-      //   },
-      //   fail: err => {
-      //     console.error('点赞数更新失败:', err);
-      //   }
-      // })
+  
+      } catch (err) {
+        console.error('点赞操作失败:', err);
+        // 发生错误时，回滚UI状态
+        this.setData({
+          isLiked: !this.data.isLiked,
+          likeCount: this.data.likeCount + (!this.data.isLiked ? 1 : -1)
+        });
+        
+        wx.showToast({
+          title: '操作失败',
+          icon: 'none'
+        });
+      }
+  
     },
     navigateTo(e) {
       const { index, url, content, ratio, title, short_title, docid } = e.currentTarget.dataset

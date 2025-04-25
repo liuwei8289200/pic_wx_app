@@ -44,6 +44,23 @@ view, scroll-view, page, image {
   height: 30px;
 }
 
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  background-color: #4682b4;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.refresh-icon {
+  font-size: 18px;
+  margin-right: 5px;
+  line-height: 1;
+}
+
 .cnt {
     top: 0;
     width: 100%;

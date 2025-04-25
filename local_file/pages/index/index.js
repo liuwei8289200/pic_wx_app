@@ -1,5 +1,5 @@
 import { installRouteBuilder } from './route'
-import { compareVersion, generateGridListNew, getModelsGridImages } from './utils'
+import { compareVersion, generateGridListNew, getModelsGridImages, getTotalImagesCount, getRandomPageNumber, getNextUnusedPageNumber } from './utils'
 
 const { screenWidth } = wx.getSystemInfoSync()
 const descList = [
@@ -21,6 +21,8 @@ Component({
     imageMargin: 12, // 图片间距
     lineLimit: 3, // 每行多少张图片
     list: [],
+    randomSeed: 0,
+    totalImagesCount: 0, // 图片总数
 
     gridList: [],
     padding: 4,
@@ -28,14 +30,65 @@ Component({
   },
   methods:{
     onLoad() {
+      // 生成一个随机种子 (1-1000000之间的整数)
+      const randomSeed = Math.floor(Math.random() * 1000000) + 1;
+      this.setData({
+        randomSeed: randomSeed
+      });
+      console.log("生成随机种子:", randomSeed);
+      
       this.loadSwiperImages();
-      this.loadGridListFromModels();
+      
+      // 先获取图片总数
+      this.getTotalCount().then(() => {
+        // 获取随机页码并加载数据
+        this.loadInitialGridList();
+      });
+      
       const { imageMargin, lineLimit } = this.data
       const { screenWidth } = wx.getSystemInfoSync()
       this.setData({
         imageWidth: (screenWidth - imageMargin * 4) / lineLimit, // 图片宽度
       })
     },
+    
+    // 获取图片总数
+    async getTotalCount() {
+      try {
+        const count = await getTotalImagesCount();
+        this.setData({
+          totalImagesCount: count
+        });
+        console.log("设置图片总数:", count);
+      } catch (error) {
+        console.error("获取图片总数失败:", error);
+      }
+    },
+    
+    // 首次加载时使用随机页码
+    async loadInitialGridList() {
+      if (this.data.isLoading) return;
+      this.setData({ isLoading: true });
+      
+      // 根据图片总数和每页大小生成随机页码
+      const randomPage = getRandomPageNumber(this.data.totalImagesCount, this.data.pageSize);
+      
+      // 设置初始页码
+      this.setData({ page: randomPage });
+      console.log("初始随机页码:", randomPage);
+      
+      // 加载对应页码的数据
+      await getModelsGridImages(randomPage, this.data.pageSize, this.data.randomSeed).then(ans => {
+        this.setData({
+          gridList: ans,
+          isLoading: false
+        });
+      }).catch(err => {
+        console.error('获取图片列表失败:', err);
+        this.setData({ isLoading: false });
+      });
+    },
+    
     onShow() {
     },
     loadSwiperImages() {
@@ -91,11 +144,18 @@ Component({
       if (this.data.isLoading) return; // 如果正在加载，直接返回
       this.setData({ isLoading: true }); // 设置加载状态
 
+      // 获取未使用过的下一个页码
+      const nextPage = getNextUnusedPageNumber(
+        this.data.totalImagesCount, 
+        this.data.pageSize, 
+        this.data.page
+      );
+      
       // 模拟异步加载数据
-      await getModelsGridImages(this.data.page, this.data.pageSize).then(ans => {
+      await getModelsGridImages(nextPage, this.data.pageSize, this.data.randomSeed).then(ans => {
         this.setData({
           gridList: this.data.gridList.concat(ans), // 追加新数据
-          page: this.data.page + 1, // 更新页数
+          page: nextPage, // 更新为新的页码
           isLoading: false // 重置加载状态
         });
       }).catch(err => {
@@ -109,6 +169,30 @@ Component({
     loadMoreImages() {
       this.loadWaterfallImages();
     },
+    
+    // refreshImages() {
+    //   // 生成新的随机种子
+    //   const randomSeed = Math.floor(Math.random() * 1000000) + 1;
+      
+    //   // 重置页面状态
+    //   this.setData({
+    //     randomSeed: randomSeed,
+    //     gridList: [], // 清空现有数据
+    //     isLoading: false
+    //   });
+      
+    //   // 显示加载提示
+    //   wx.showToast({
+    //     title: '刷新中...',
+    //     icon: 'loading',
+    //     duration: 1500
+    //   });
+      
+    //   console.log("重新生成随机种子:", randomSeed);
+      
+    //   // 重新获取随机页码并加载数据
+    //   this.loadInitialGridList();
+    // },
     viewImageDetail(event) {
       const imageUrl = event.currentTarget.dataset.url;
       wx.navigateTo({

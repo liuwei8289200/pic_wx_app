@@ -75,7 +75,7 @@ Page({
         select: {
           connect_image_liked_users:{
             _id:true,
-          }
+          },
         },
         filter: {
           where: {

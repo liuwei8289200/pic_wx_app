@@ -6,11 +6,11 @@
 				<image class="card_img" mode="widthFix" fade-in src="{{item.src}}" bindtap="navigateTo" bindlongpress="saveImage" data-index="{{index}}" data-url="{{item.src}}" data-content="{{item.content}}" data-ratio="{{item.imageRatio}}" data-title="{{item.title}}" data-short_title="{{item.short_title}}" data-docid="{{item.docid}}" style="height: {{cardWidth / item.imageRatio}}px; background-color: {{item.color}};"/>
 				<view class="card_desc" style="color: #000;">
 					<view class="card_content">{{item.short_title}}</view>
-					<view class="card_footer">
+					<view class="card_footer" wx:if="{{item.foot_is_show}}">
 						<!-- <image class="card_avatar" src="https://res.wx.qq.com/op_res/BqgN85sXxTbk1kynEEihrwQPXmcn86nOyioRnPAfkrbZteUWsKfEpgoYZ1pk-3TMTc_qXFSElIgkvILR-zzh1Q" /> -->
 						<!---><text class="card_nickname">{{item.nickname}}</text><-->
-						<image class="card_avatar" src="icons/like2.png" bindtap="likeImage" data-docid="{{item.docid}}"/>
-						<text class="card_like">{{item.like}}</text>
+						<image class="card_avatar" src="{{isLiked ? '../../images/icon_like_active.png' : '../../images/icon_like.png'}}" bindtap="likeImage" data-docid="{{item.docid}}" data-likeusers="{{item.like_users}}" />
+						<text class="card_like">{{likeCount}}</text>
 					</view>
 				</view>
 			</view>

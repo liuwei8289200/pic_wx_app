@@ -29,8 +29,8 @@
     <scroll-view
       scroll-y
       style="height: calc(100vh - 380rpx); width: 100%;"
+      type="custom"
       show-scrollbar="{{false}}"
-      bindscrolltolower="loadMore"
     >
       <grid-view type="masonry" wx:if="{{gridList.length > 0}}">
         <card

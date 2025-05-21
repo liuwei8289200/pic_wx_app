@@ -120,7 +120,7 @@ Page({
       });
       console.log("userQuery", userQuery)
       
-      if (Object.keys(userQuery).length > 0) {
+      if (Object.keys(userQuery.data).length > 0) {
         // 更新现有记录
         
         const {data} = await models.user_info.update({

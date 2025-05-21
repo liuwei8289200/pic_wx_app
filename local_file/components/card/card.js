@@ -100,7 +100,7 @@ Component({
     initLikeStatus() {
       const openId = wx.getStorageSync('openId');
       const item = this.data.item || {};
-      console.log("item is", item);
+      //console.log("item is", item);
       // 检查connect_image_liked_users是否存在且是数组
       if (item.like_users && Array.isArray(item.like_users)) {
         // 获取点赞列表
@@ -133,7 +133,7 @@ Component({
     isUserLiked() {
       const openId = wx.getStorageSync('openId');
       const item = this.data.item || {};
-      console.log("item is", item);
+      //console.log("item is", item);
       
       // 检查connect_image_liked_users是否存在且是数组
       if (item.connect_image_liked_users && Array.isArray(item.connect_image_liked_users)) {
@@ -150,8 +150,8 @@ Component({
       
       // 获取当前用户是否已点赞
       const openId = wx.getStorageSync('openId');
-      
-      if (!openId) {
+      const loginStatus = wx.getStorageSync('loginStatus');
+      if (!openId || !loginStatus) {
         wx.showToast({
           title: '请先登录',
           icon: 'none'

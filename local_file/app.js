@@ -16,8 +16,15 @@ App({
     const logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
-    
+    console.log("onLaunch 1111111111111111");
     // 检查用户登录状态
+    this.checkUserLoginStatus();
+  },
+  
+  // 每次进入小程序时执行
+  onShow() {
+    console.log('小程序显示，检查登录状态');
+    // 每次进入小程序时都检查用户登录状态
     this.checkUserLoginStatus();
   },
   
@@ -38,7 +45,7 @@ App({
         
         // 设置登录状态
         wx.setStorageSync('loginStatus', status);
-        
+        console.log("登录态 11111111", respone);
         if (status) {
           // 用户已登录，保存用户信息
           wx.setStorageSync('userInfo', {

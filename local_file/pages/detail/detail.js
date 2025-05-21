@@ -120,7 +120,7 @@ Page({
     // 检查用户登录状态
     const loginStatus = wx.getStorageSync('loginStatus');
     const openId = wx.getStorageSync('openId');
-    
+    console.log("点赞状态", loginStatus);
     if (!loginStatus || !openId) {
       wx.showToast({
         title: '请先登录',
@@ -229,7 +229,7 @@ Page({
     // 检查用户登录状态
     const loginStatus = wx.getStorageSync('loginStatus');
     const openId = wx.getStorageSync('openId');
-    
+    console.log("评论状态", loginStatus);
     if (!loginStatus || !openId) {
       wx.showToast({
         title: '请先登录',

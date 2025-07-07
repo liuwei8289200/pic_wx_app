@@ -1,4 +1,4 @@
-const { screenWidth } = wx.getSystemInfoSync()
+const { screenWidth, screenHeight } = wx.getSystemInfoSync()
 const { init } = require("@cloudbase/wx-cloud-client-sdk");
 const { compareVersion } = require("../index/utils");
 const client = init(wx.cloud)
@@ -27,19 +27,25 @@ Page({
     commentText: '',
     comments: [],
     // 加载状态
-    isLoading: true
+    isLoading: true,
+    // 图片预览相关
+    isImagePreview: false,
+    previewStyle: ''
   },
 
   onLoad(options) {
     // 处理传入的参数
+    // 解码微信自动编码的参数
+    const decodeParam = (param) => param ? decodeURIComponent(param) : '';
+    
     const initialData = {
       image_id: options.image_id,
-      content: options.content,
+      content: decodeParam(options.content),
       ratio: options.ratio,
       swiperHeight: screenWidth / options.ratio,
-      url: options.url,
-      short_title: options.short_title,
-      title: options.title,
+      url: decodeParam(options.url),
+      short_title: decodeParam(options.short_title),
+      title: decodeParam(options.title),
       // 如果从列表页传递了点赞信息，直接使用
       likeCount: options.likeCount ? parseInt(options.likeCount) : 0,
       isLiked: options.isLiked === 'true',
@@ -114,6 +120,58 @@ Page({
   // 返回上一页
   goBack() {
     wx.navigateBack();
+  },
+
+  // 处理图片点击，放大查看
+  handleImageClick() {
+    // 判断是不是已经在预览状态
+    if (this.data.isImagePreview) {
+      return;
+    }
+    
+    // 计算图片放大后的样式
+    // 获取原始图片比例
+    const imageRatio = parseFloat(this.data.ratio);
+    
+    // 计算图片在全屏下的尺寸
+    let previewWidth, previewHeight;
+    
+    if (screenWidth / screenHeight > imageRatio) {
+      // 如果屏幕比例宽于图片，以高度为基准
+      previewHeight = screenHeight;
+      previewWidth = previewHeight * imageRatio;
+    } else {
+      // 如果屏幕比例窄于图片，以宽度为基准
+      previewWidth = screenWidth;
+      previewHeight = previewWidth / imageRatio;
+    }
+    
+    // 计算居中位置
+    const left = (screenWidth - previewWidth) / 2;
+    const top = (screenHeight - previewHeight) / 2;
+    
+    // 设置样式
+    const previewStyle = `width: ${previewWidth}px; height: ${previewHeight}px; left: ${left}px; top: ${top}px;`;
+    
+    this.setData({
+      isImagePreview: true,
+      previewStyle
+    });
+  },
+  
+  // 关闭图片预览
+  closeImagePreview() {
+    this.setData({
+      isImagePreview: false
+    });
+  },
+  
+  // 使用微信原生预览功能
+  previewImage() {
+    wx.previewImage({
+      current: this.data.url, // 当前显示图片的链接
+      urls: [this.data.url] // 需要预览的图片链接列表
+    });
   },
 
   async handleLike() {
@@ -321,7 +379,12 @@ Page({
   onShareAppMessage() {
     return {
       title: this.data.title,
-      path: '/pages/detail/detail?image_id=' + this.data.image_id
+      path: '/pages/detail/detail?image_id=' + this.data.image_id + 
+            '&content=' + encodeURIComponent(this.data.content) +
+            '&url=' + encodeURIComponent(this.data.url) +
+            '&title=' + encodeURIComponent(this.data.title) +
+            '&short_title=' + encodeURIComponent(this.data.short_title) +
+            '&ratio=' + this.data.ratio
     };
   },
 

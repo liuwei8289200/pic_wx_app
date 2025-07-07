@@ -25,7 +25,14 @@
 			 show-scrollbar="{{false}}"
 			>
 				<view>
-					<image class="detail-image" mode="widthFix" src="{{url}}" style="width: 100%; height: {{swiperHeight}}px;" bindlongpress="saveImageToAlbum" />
+					<image 
+            class="detail-image" 
+            mode="widthFix" 
+            src="{{url}}" 
+            style="width: 100%; height: {{swiperHeight}}px;" 
+            bindlongpress="saveImageToAlbum" 
+            bindtap="previewImage" 
+          />
 				</view>
 				<view class="detail-content">
 				<view class="detail-title">{{title}}</view>
@@ -95,6 +102,18 @@
 					/>
 					<view class="send-btn" bindtap="sendComment">发送</view>
 				</view>
+			</view>
+			
+			<!-- 图片全屏预览浮层 -->
+			<view class="image-preview-container" wx:if="{{isImagePreview}}" catchtap="closeImagePreview">
+				<image 
+					class="preview-image" 
+					mode="aspectFit" 
+					src="{{url}}" 
+					style="{{previewStyle}}"
+					catchtap="stopPropagation" 
+				/>
+				<view class="preview-close" catchtap="closeImagePreview">×</view>
 			</view>
 		</view>
 	</view>

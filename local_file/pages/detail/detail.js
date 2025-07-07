@@ -122,6 +122,13 @@ Page({
     wx.navigateBack();
   },
 
+  // 返回主页
+  goHome() {
+    wx.switchTab({
+      url: '/pages/index/index'
+    });
+  },
+
   // 处理图片点击，放大查看
   handleImageClick() {
     // 判断是不是已经在预览状态

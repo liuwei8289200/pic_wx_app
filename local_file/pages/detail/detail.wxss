@@ -32,9 +32,20 @@ view, scroll-view, page, image {
   display: flex;
   flex-direction: row;
   padding: 0 20px;
-  justify-content: center;
   align-items: center;
   font-size: 14px;
+}
+
+.navigation-bar-left {
+  display: flex;
+  align-items: center;
+  width: 60px;
+}
+
+.navigation-bar-back {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
 }
 
 .navigation-bar-avatar {
@@ -43,9 +54,18 @@ view, scroll-view, page, image {
   border-radius: 100%;
 }
 
-.navigation-bar-title {
+.navigation-bar-center {
   flex: 1;
-  padding-left: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.navigation-bar-title {
+  max-width: 70%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .navigation-bar-follow {

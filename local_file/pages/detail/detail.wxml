@@ -3,7 +3,9 @@
 		<view id="page" bindtap="onPageTap">
 			<view class="navigation-bar">
 				<view class="navigation-bar-content">
-					<image class="navigation-bar-avatar" src="https://res.wx.qq.com/op_res/BqgN85sXxTbk1kynEEihrwQPXmcn86nOyioRnPAfkrbZteUWsKfEpgoYZ1pk-3TMTc_qXFSElIgkvILR-zzh1Q" />
+					<view class="navigation-bar-left">
+						<image class="navigation-bar-back" src="/images/back_2_home.png" bindtap="goHome" />
+					</view>
 					<view class="navigation-bar-title">{{short_title}}</view>
 					<!-- <view class="navigation-bar-follow">关注</view> -->
 				</view>
@@ -118,4 +120,3 @@
 		</view>
 	</view>
 </pan-gesture-handler>
-

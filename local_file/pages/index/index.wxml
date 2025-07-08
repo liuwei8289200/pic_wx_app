@@ -1,14 +1,7 @@
 <!--pages/index/index.wxml-->
 <navigation-bar back="{{false}}" title="梦幻国王"></navigation-bar>
 <view class="top-bar">
-  <!-- <input class="search" placeholder="搜索"/> -->
   <image class="logo" src="../../images/logo.png" mode="aspectFit" />
-  <!-- <button class="help">帮助</button> -->
-   <!-- <view class="refresh-btn" bindtap="refreshImages">
-    <text class="refresh-icon">🔄</text>
-    <text>随机刷新</text>
-  </view>
-  -->
 </view>
 
 <scroll-view
@@ -28,9 +21,7 @@
     </swiper-item>
   </block>
 </swiper>
-  <grid-view
-    type="masonry"
-  >
+  <grid-view type="masonry">
     <card
       wx:for="{{gridList}}"
       wx:key="id"

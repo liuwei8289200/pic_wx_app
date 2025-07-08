@@ -1,8 +1,6 @@
-<!--pages/home/home.wxml-->
 <navigation-bar back="{{false}}" title="个人中心"></navigation-bar>
 
 <view class="page-container">
-  <!-- 用户信息区域 -->
   <view class="user-info-container">
     <view class="user-info" wx:if="{{hasUserInfo}}">
       <image class="avatar" src="{{userInfo.avatar}}" mode="aspectFill"></image>
@@ -14,7 +12,6 @@
     </view>
   </view>
 
-  <!-- 标签页 -->
   <view class="tabs">
     <view class="tab {{currentTab === 'likes' ? 'active' : ''}}" bindtap="switchTab" data-tab="likes">
       赞过的图片
@@ -24,7 +21,6 @@
     </view>
   </view>
 
-  <!-- 赞过的图片列表 -->
   <view class="content-area" wx:if="{{currentTab === 'likes'}}">
     <scroll-view
       scroll-y
@@ -48,7 +44,6 @@
     </scroll-view>
   </view>
 
-  <!-- 设置页面 -->
   <view class="content-area" wx:if="{{currentTab === 'settings'}}">
     <view class="settings-list">
       <view class="settings-item" bindtap="goToUserProfile">

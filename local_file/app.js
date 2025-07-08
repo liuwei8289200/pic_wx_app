@@ -66,5 +66,27 @@ App({
       wx.setStorageSync('loginStatus', false);
       wx.removeStorageSync('userInfo');
     }
+  },
+
+  globalData: {
+    shareInfo: {
+      title: '分享小程序',
+      path: '/pages/index/index',
+      imageUrl: '/images/logo.png'
+    }
+  },
+
+  // 全局分享配置 - 分享给朋友
+  onShareAppMessage() {
+    return this.globalData.shareInfo;
+  },
+
+  // 全局分享配置 - 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: this.globalData.shareInfo.title,
+      query: '',
+      imageUrl: this.globalData.shareInfo.imageUrl
+    }
   }
 })

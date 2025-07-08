@@ -10,7 +10,9 @@
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "WeChat",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "enableShareAppMessage": true,
+    "enableShareTimeline": true
   },
   "tabBar": {
     "_custom": true,

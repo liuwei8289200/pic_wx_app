@@ -4,5 +4,8 @@
     "card": "../../components/card/card"
   },
   "disableScroll": true,
-  "navigationStyle": "custom"
+  "navigationStyle": "custom",
+  "navigationBarTextStyle": "black",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

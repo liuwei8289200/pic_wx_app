@@ -6,8 +6,10 @@ const descList = [
     '这里风景好美～',
     '这是哪里呀？快介绍一下～～～～'
 ]
-Page({});
+
 Component({
+  properties: {},
+  
   data: {
     swiperImages: [],
     imageList: [], // 瀑布流图片
@@ -28,7 +30,21 @@ Component({
     padding: 4,
     cardWidth: (screenWidth - 4 * 2 - 4) / 2, // 减去间距
   },
-  methods:{
+
+  lifetimes: {
+    attached() {
+      this.onLoad();
+    }
+  },
+
+  pageLifetimes: {
+    show() {
+      // 页面显示时触发
+      this.onShow();
+    }
+  },
+
+  methods: {
     onLoad() {
       // 生成一个随机种子 (1-1000000之间的整数)
       const randomSeed = Math.floor(Math.random() * 1000000) + 1;
@@ -206,6 +222,26 @@ Component({
         console.log(res)
       })
     },
+
+    // 分享给朋友
+    onShareAppMessage() {
+      const app = getApp();
+      return {
+        title: '发现好看的图片，快来看看吧！',
+        path: '/pages/index/index',
+        imageUrl: this.data.swiperImages[0] || app.globalData.shareInfo.imageUrl
+      };
+    },
+
+    // 分享到朋友圈
+    onShareTimeline() {
+      const app = getApp();
+      return {
+        title: '发现好看的图片，快来看看吧！',
+        query: '',
+        imageUrl: this.data.swiperImages[0] || app.globalData.shareInfo.imageUrl
+      };
+    }
   },
   lifetimes: {
     created() {

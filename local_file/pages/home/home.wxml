@@ -1,5 +1,5 @@
 <!--pages/home/home.wxml-->
-<navigation-bar back title="个人中心"></navigation-bar>
+<navigation-bar back="{{false}}" title="个人中心"></navigation-bar>
 
 <view class="page-container">
   <!-- 用户信息区域 -->

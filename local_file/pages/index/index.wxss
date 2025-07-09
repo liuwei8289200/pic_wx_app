@@ -1,3 +1,5 @@
+@import "../font/iconfont.wxss";
+
 page {
   display: flex;
   flex-direction: column;
@@ -37,8 +39,8 @@ view, scroll-view, page, image {
 }
 
 .logo {
-  width: 30px;
-  height: 30px;
+  font-size: 48rpx;  /* 调整图标大小 */
+  color: #333;  /* 设置图标颜色 */
 }
 
 .safe-area-inset-bottom {

@@ -38,9 +38,13 @@ view, scroll-view, page, image {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.logo {
+.logo.tmp {
   font-size: 48rpx;  /* 调整图标大小 */
   color: #333;  /* 设置图标颜色 */
+}
+.logo {
+  width: 30px;
+  height: 30px;
 }
 
 .safe-area-inset-bottom {

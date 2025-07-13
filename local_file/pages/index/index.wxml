@@ -1,7 +1,7 @@
 <!--pages/index/index.wxml-->
 <navigation-bar back="{{false}}" title="梦幻国王"></navigation-bar>
 <view class="top-bar">
-  <text class="iconfont icon-xihuan logo"></text>
+  <image class="logo" src="../../images/logo.png" mode="aspectFit" />
 </view>
 
 <scroll-view

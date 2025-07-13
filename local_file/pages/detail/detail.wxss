@@ -211,7 +211,7 @@ view, scroll-view, page, image {
   margin-right: 12rpx;
 }
 
-.action-icon.icon-shouye-zhihui {
+.action-icon.icon-guanzhu-zhihui {
   color: #ff4757;
 }
 

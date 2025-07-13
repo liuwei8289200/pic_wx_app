@@ -4,7 +4,7 @@
 			<view class="navigation-bar">
 				<view class="navigation-bar-content">
 					<view class="navigation-bar-left">
-						<image class="navigation-bar-back" src="/images/back_2_home.png" bindtap="goHome" />
+						<text class="navigation-bar-back iconfont icon-shouye-zhihui" bindtap="goHome"></text>
 					</view>
 					<view class="navigation-bar-title">{{short_title}}</view>
 					<!-- <view class="navigation-bar-follow">关注</view> -->
@@ -75,7 +75,7 @@
 						<view class="action-group tmp-a" bindtap="{{!isLoading ? 'handleLike' : ''}}">
 							<view class="action-btn">
 								<view class="action-btn-inner">
-									<text class="action-icon iconfont {{isLoading ? 'icon-shouye-zhihui' : (isLiked ? 'icon-shouye-zhihui' : 'icon-xihuan')}}"></text>
+									<text class="action-icon iconfont {{isLoading ? 'icon-guanzhu-zhihui' : (isLiked ? 'icon-guanzhu-zhihui' : 'icon-xihuan')}}"></text>
 									<text class="action-text {{isLoading ? 'skeleton skeleton-text' : ''}}">{{isLoading ? '' : likeCount}}</text>
 								</view>
 							</view>

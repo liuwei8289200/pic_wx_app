@@ -4,7 +4,7 @@
 			<view class="navigation-bar">
 				<view class="navigation-bar-content">
 					<view class="navigation-bar-left">
-						<image class="navigation-bar-back" src="/images/back_2_home.png" bindtap="goHome" />
+						<text class="navigation-bar-back iconfont icon-shouye-zhihui" bindtap="goHome"></text>
 					</view>
 					<view class="navigation-bar-title">{{short_title}}</view>
 					<!-- <view class="navigation-bar-follow">关注</view> -->
@@ -60,34 +60,23 @@
 			<view class="footer">
 				<view class="footer-content">
 					<!-- 左侧分享按钮 -->
-					<view class="action-group tmp-b">
-						<button class="share-btn" open-type="share">
-							<view class="action-btn-inner">
-								<image class="action-icon" src="/images/icon_share.png"></image>
-								<text class="action-text">分享</text>
-							</view>
-						</button>
-					</view>
+					<button class="action-item share-btn" open-type="share">
+						<text class="action-icon iconfont icon-a-fenxiang2"></text>
+						<text class="action-text">分享</text>
+					</button>
 
-					<!-- 右侧按钮组 -->
+					<!-- 右侧操作按钮组 -->
 					<view class="right-actions">
-						<!-- 点赞按钮 - 加载中显示骨架屏 -->
-						<view class="action-group tmp-a" bindtap="{{!isLoading ? 'handleLike' : ''}}">
-							<view class="action-btn">
-								<view class="action-btn-inner">
-									<image class="action-icon" src="{{isLoading ? '/images/icon_like.png' : (isLiked ? '/images/icon_like_active.png' : '/images/icon_like.png')}}"></image>
-									<text class="action-text {{isLoading ? 'skeleton skeleton-text' : ''}}">{{isLoading ? '' : likeCount}}</text>
-								</view>
-							</view>
+						<!-- 点赞按钮 -->
+						<view class="action-item like-btn" bindtap="{{!isLoading ? 'handleLike' : ''}}">
+							<text class="action-icon iconfont {{isLoading ? 'icon-xihuan' : (isLiked ? 'icon-guanzhu-zhihui' : 'icon-xihuan')}}"></text>
+							<text class="action-text {{isLoading ? 'skeleton skeleton-text' : ''}}">{{isLoading ? '' : (likeCount > 0 ? likeCount + '+' : '0')}}</text>
 						</view>
-						<!-- 评论按钮 - 加载中也显示骨架屏 -->
-						<view class="action-group" catchtap="{{!isLoading ? 'showCommentInput' : ''}}">
-							<view class="action-btn">
-								<view class="action-btn-inner">
-									<image class="action-icon" src="/images/icon_comment.png"></image>
-									<text class="action-text {{isLoading ? 'skeleton skeleton-text' : ''}}">{{isLoading ? '' : commentCount}}</text>
-								</view>
-							</view>
+
+						<!-- 评论按钮 -->
+						<view class="action-item comment-btn" catchtap="{{!isLoading ? 'showCommentInput' : ''}}">
+							<text class="action-icon iconfont icon-xiaoxi-zhihui"></text>
+							<text class="action-text {{isLoading ? 'skeleton skeleton-text' : ''}}">{{isLoading ? '' : (commentCount > 0 ? commentCount + '+' : '0')}}</text>
 						</view>
 					</view>
 				</view>

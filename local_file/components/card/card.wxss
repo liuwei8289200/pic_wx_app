@@ -1,3 +1,5 @@
+@import "../../pages/font/iconfont.wxss";
+
 .card {
   border-radius: 5px;
   overflow: hidden;
@@ -42,6 +44,19 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #666666;
+}
+
+.card_avatar.icon-guanzhu-zhihui {
+  color: #ff4757;
+}
+
+.card_avatar.icon-xihuan {
+  color: #666666;
 }
 
 .card_nickname {

@@ -9,7 +9,7 @@
 					<view class="card_footer" wx:if="{{item.foot_is_show}}">
 						<!-- <image class="card_avatar" src="https://res.wx.qq.com/op_res/BqgN85sXxTbk1kynEEihrwQPXmcn86nOyioRnPAfkrbZteUWsKfEpgoYZ1pk-3TMTc_qXFSElIgkvILR-zzh1Q" /> -->
 						<!---><text class="card_nickname">{{item.nickname}}</text><-->
-						<image class="card_avatar" src="{{isLiked ? '../../images/icon_like_active.png' : '../../images/icon_like.png'}}" bindtap="likeImage" data-docid="{{item.docid}}" data-likeusers="{{item.like_users}}" />
+						<text class="card_avatar iconfont {{isLiked ? 'icon-guanzhu-zhihui' : 'icon-xihuan'}}" bindtap="likeImage" data-docid="{{item.docid}}" data-likeusers="{{item.like_users}}"></text>
 						<text class="card_like">{{likeCount}}</text>
 					</view>
 				</view>

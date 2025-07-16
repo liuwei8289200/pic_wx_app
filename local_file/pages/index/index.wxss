@@ -33,7 +33,7 @@ view, scroll-view, page, image {
   align-items: center;
   justify-content: space-around;
   padding: 10px;
-  background-color: #f0f8ff;
+  /* background-color: #f0f8ff; */
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -43,8 +43,8 @@ view, scroll-view, page, image {
   color: #333;  /* 设置图标颜色 */
 }
 .logo {
-  width: 30px;
-  height: 30px;
+  width: 39px;
+  height: 39px;
 }
 
 .safe-area-inset-bottom {

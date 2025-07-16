@@ -12,7 +12,7 @@
 						<!-- <text class="card_avatar iconfont {{isLiked ? 'icon-guanzhu-zhihui' : 'icon-xihuan'}}" bindtap="likeImage" data-docid="{{item.docid}}" data-likeusers="{{item.like_users}}"></text> -->
 						<image
 						  class="card_avatar"
-						  src="./icons/{{isLiked ? '首页.svg' : '首页激活.svg'}}"
+						  src="../../images/{{isLiked ? 'like-active.png' : 'like.png'}}"
 						  bindtap="likeImage"
 						  data-docid="{{item.docid}}"
 						  data-likeusers="{{item.like_users}}"

@@ -2,10 +2,6 @@ import { installRouteBuilder } from './route'
 import { compareVersion, generateGridListNew, getModelsGridImages, getTotalImagesCount, getRandomPageNumber, getNextUnusedPageNumber } from './utils'
 
 const { screenWidth } = wx.getSystemInfoSync()
-const descList = [
-    '这里风景好美～',
-    '这是哪里呀？快介绍一下～～～～'
-]
 
 Component({
   properties: {},

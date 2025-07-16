@@ -63,8 +63,9 @@
 					<view class="action-group tmp-b">
 						<button class="share-btn" open-type="share">
 							<view class="action-btn-inner">
-								<text class="action-icon iconfont icon-a-fenxiang2"></text>
-								<text class="action-text">分享</text>
+								<!-- <text class="action-icon iconfont icon-a-fenxiang2"></text>
+								<text class="action-text">分享</text> -->
+                		<image class="action-icon" src="../../images/share.png" />		
 							</view>
 						</button>
 					</view>
@@ -75,7 +76,8 @@
 						<view class="action-group tmp-a" bindtap="{{!isLoading ? 'handleLike' : ''}}">
 							<view class="action-btn">
 								<view class="action-btn-inner">
-									<text class="action-icon iconfont {{isLoading ? 'icon-guanzhu-zhihui' : (isLiked ? 'icon-guanzhu-zhihui' : 'icon-xihuan')}}"></text>
+									<!-- <text class="action-icon iconfont {{isLoading ? 'icon-guanzhu-zhihui' : (isLiked ? 'icon-guanzhu-zhihui' : 'icon-xihuan')}}"></text> -->
+									<image class="action-icon" src="../../images/{{isLiked ? 'like-active.png' : 'like.png'}}" />
 									<text class="action-text {{isLoading ? 'skeleton skeleton-text' : ''}}">{{isLoading ? '' : likeCount}}</text>
 								</view>
 							</view>
@@ -84,7 +86,8 @@
 						<view class="action-group" catchtap="{{!isLoading ? 'showCommentInput' : ''}}">
 							<view class="action-btn">
 								<view class="action-btn-inner">
-									<text class="action-icon iconfont icon-xiaoxi-zhihui"></text>
+									<!-- <text class="action-icon iconfont icon-xiaoxi-zhihui"></text> -->
+									<image class="action-icon" src="../../images/comment.png" />
 									<text class="action-text {{isLoading ? 'skeleton skeleton-text' : ''}}">{{isLoading ? '' : commentCount}}</text>
 								</view>
 							</view>

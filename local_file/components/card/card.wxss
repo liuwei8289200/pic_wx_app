@@ -7,7 +7,13 @@
   width: 100%;
   background-color: white;
 }
-
+.card_like {
+    display: flex;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    margin-left: 5px; /* 与图标保持一定间距 */
+  }
 .card_wrap {
   position: absolute;
   transform-origin: 0 0;
@@ -41,9 +47,8 @@
 }
 
 .card_avatar {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;

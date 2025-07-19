@@ -4,7 +4,7 @@
 			<view class="navigation-bar">
 				<view class="navigation-bar-content">
 					<view class="navigation-bar-left">
-						<text class="navigation-bar-back iconfont icon-shouye-zhihui" bindtap="goHome"></text>
+						<image class="navigation-bar-back" src="../../images/page.png" bindtap="goHome"></image>
 					</view>
 					<view class="navigation-bar-title">{{short_title}}</view>
 					<!-- <view class="navigation-bar-follow">关注</view> -->

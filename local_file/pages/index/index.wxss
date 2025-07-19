@@ -43,8 +43,8 @@ view, scroll-view, page, image {
   color: #333;  /* 设置图标颜色 */
 }
 .logo {
-  width: 39px;
-  height: 39px;
+  width: 42px;
+  height: 42px;
 }
 
 .safe-area-inset-bottom {

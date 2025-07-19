@@ -21,13 +21,13 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "iconPath": "/images/首页.png",
-        "selectedIconPath": "/images/首页-激活.png"
+        "iconPath": "/images/page.png",
+        "selectedIconPath": "/images/page-active.png"
       },
       {
         "pagePath": "pages/home/home",
-        "iconPath": "/images/个人中心.png",
-        "selectedIconPath": "/images/个人中心-激活.png"
+        "iconPath": "/images/home.png",
+        "selectedIconPath": "/images/home-active.png"
       }
     ]
   },

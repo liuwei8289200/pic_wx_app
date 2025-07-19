@@ -201,12 +201,12 @@ view, scroll-view, page, image {
 }
 
 .action-icon {
-  width: 48rpx;
-  height: 48rpx;
+  width: 39rpx;
+  height: 39rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40rpx;
+  font-size: 32rpx;
   color: #666666;
   margin-right: 12rpx;
 }

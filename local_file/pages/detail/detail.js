@@ -3,6 +3,7 @@ const { init } = require("@cloudbase/wx-cloud-client-sdk");
 const { compareVersion } = require("../index/utils");
 const client = init(wx.cloud)
 const models = client.models
+const { emit } = require('../../utils/eventBus');
 
 Page({
   data: {
@@ -201,6 +202,11 @@ Page({
       
       // 使用setData更新状态，触发视图更新
       this.setData({
+        isLiked: newIsLiked,
+        likeCount: newLikeCount
+      });
+      emit('likeChanged', {
+        imageId: this.data.image_id,
         isLiked: newIsLiked,
         likeCount: newLikeCount
       });

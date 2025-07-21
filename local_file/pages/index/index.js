@@ -1,5 +1,6 @@
 import { installRouteBuilder } from './route'
 import { compareVersion, generateGridListNew, getModelsGridImages, getTotalImagesCount, getRandomPageNumber, getNextUnusedPageNumber } from './utils'
+import { on } from '../../utils/eventBus';
 
 const { screenWidth } = wx.getSystemInfoSync()
 
@@ -30,6 +31,16 @@ Component({
   lifetimes: {
     attached() {
       this.onLoad();
+      // 监听点赞事件
+      on('likeChanged', ({ imageId, isLiked, likeCount }) => {
+        const gridList = this.data.gridList.map(item => {
+          if (item.id === imageId) {
+            return { ...item, isLiked, likeCount };
+          }
+          return item;
+        });
+        this.setData({ gridList });
+      });
     }
   },
 

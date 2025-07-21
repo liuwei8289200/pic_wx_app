@@ -1,4 +1,5 @@
 const { shared } = wx.worklet
+import { on } from '../../utils/eventBus';
 
 const FlightDirection = {
   PUSH: 0,
@@ -47,6 +48,16 @@ Component({
     },
     attached() {
       this.initLikeStatus()
+      // 监听点赞事件，实现本地同步
+      on('likeChanged', ({ imageId, isLiked, likeCount }) => {
+        const item = this.data.item || {};
+        if (item.docid === imageId) {
+          this.setData({
+            isLiked,
+            likeCount
+          });
+        }
+      });
       this.applyAnimatedStyle(
         '.card_wrap', 
         () => {

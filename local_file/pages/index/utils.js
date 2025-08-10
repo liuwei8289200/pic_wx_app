@@ -35,7 +35,23 @@ const nicknames = [
   'ERIC',
   'SANFORD',
 ]
-
+const imageRatios = {
+  "1:1": {  // 1:1
+    width: 1,
+    height: 1,
+    imageRatio: 1 / 1,
+  },
+  "3:4": {
+    width: 3,
+    height: 4,
+    imageRatio: 3 / 4,
+  },
+  "4:3": {
+    width: 4,
+    height: 3,
+    imageRatio: 4 / 3,
+  },
+}
 const imageRatio = [
   // {
   //   width: 3,
@@ -209,8 +225,14 @@ export const getModelsGridImages = async (pageNumber, pageSize, randomSeed) => {
   const ans = [];
   data.records.forEach(item => {
     //console.log("item", item);
-    const ratioIdx = Math.floor(Math.random() * imageRatio.length)
-    const ratio = imageRatio[ratioIdx]
+    //const ratioIdx = Math.floor(Math.random() * imageRatio.length)
+    // const ratio = imageRatio[ratioIdx]
+    let ratio = item.ratio
+    if (ratio == "" || ratio == null || ratio == undefined) {
+      ratio = imageRatios["1:1"]
+    } else {
+      ratio = imageRatios[ratio]
+    }
     // src 根据指定格式拼接
     const url = `https://6d69-mini-program-7gugok6cdb014aba-1258427370.tcb.qcloud.la/grid_images_online/${item.file_id}`;
     
@@ -263,8 +285,14 @@ export const generateGridListNew = (childCount, columns) => {
         // 循环 res.data，将 data 中的 url 值存入 ans 中
         res.data.forEach(item => {
           //console.log("item", item);
-          const ratioIdx = Math.floor(Math.random() * imageRatio.length)
-          const ratio = imageRatio[ratioIdx]
+          //const ratioIdx = Math.floor(Math.random() * imageRatio.length)
+          let ratio = item.ratio
+          if (ratio == "" || ratio == null || ratio == undefined) {
+            ratio = imageRatios["1:1"]
+          } else {
+            ratio = imageRatios[ratio]
+          }
+          //const ratio = imageRatio[ratioIdx]
           // src 根据指定格式拼接
           const url = `https://6d69-mini-program-7gugok6cdb014aba-1258427370.tcb.qcloud.la/grid_images/${item.file_id}`;
           

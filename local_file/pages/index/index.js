@@ -1,5 +1,19 @@
 import { installRouteBuilder } from './route'
-import { compareVersion, generateGridListNew, getModelsGridImages, getTotalImagesCount, getRandomPageNumber, getNextUnusedPageNumber } from './utils'
+import { 
+  compareVersion, 
+  generateGridListNew, 
+  getModelsGridImages, 
+  getTotalImagesCount, 
+  getRandomPageNumber, 
+  getNextUnusedPageNumber,
+  // 新增：导入完全随机加载相关函数
+  initializeImageData,
+  getRandomUnviewedImages,
+  resetImageData,
+  getImageDataStatus,
+  markImageAsViewed,
+  saveViewedImages // 新增：导入保存浏览记录的函数
+} from './utils'
 import { on } from '../../utils/eventBus';
 
 const { screenWidth } = wx.getSystemInfoSync()
@@ -26,6 +40,11 @@ Component({
     gridList: [],
     padding: 4,
     cardWidth: (screenWidth - 4 * 2 - 4) / 2, // 减去间距
+    
+    // 新增：完全随机加载相关状态
+    isInitializing: true, // 是否正在初始化数据
+    dataStatus: null, // 数据状态信息
+    showDebugInfo: false, // 是否显示调试信息
   },
 
   lifetimes: {
@@ -48,6 +67,11 @@ Component({
     show() {
       // 页面显示时触发
       this.onShow();
+    },
+    // 新增：页面隐藏时保存浏览记录
+    hide() {
+      console.log("页面隐藏，保存浏览记录");
+      saveViewedImages();
     }
   },
 
@@ -62,17 +86,59 @@ Component({
       
       this.loadSwiperImages();
       
-      // 先获取图片总数
-      this.getTotalCount().then(() => {
-        // 获取随机页码并加载数据
-        this.loadInitialGridList();
-      });
+      // 新的初始化逻辑：使用完全随机加载
+      this.initializeCompleteRandomData();
       
       const { imageMargin, lineLimit } = this.data
       const { screenWidth } = wx.getSystemInfoSync()
       this.setData({
         imageWidth: (screenWidth - imageMargin * 4) / lineLimit, // 图片宽度
       })
+    },
+    
+    // 新增：初始化完全随机数据
+    async initializeCompleteRandomData() {
+      this.setData({ 
+        isLoading: true,
+        isInitializing: true 
+      });
+      
+      try {
+        console.log("开始初始化完全随机数据");
+        
+        // 初始化图片数据（预缓存 + 后台加载全量数据）
+        const initialImages = await initializeImageData();
+        
+        // 获取第一批随机图片
+        const firstBatch = getRandomUnviewedImages(this.data.pageSize);
+        
+        this.setData({
+          gridList: firstBatch,
+          isLoading: false,
+          isInitializing: false,
+          dataStatus: this.data.showDebugInfo ? getImageDataStatus() : null
+        });
+        
+        console.log("完全随机数据初始化完成, 首批图片数量:", firstBatch.length);
+        
+      } catch (error) {
+        console.error("初始化完全随机数据失败:", error);
+        
+        // 如果新方法失败，回退到原有方法
+        console.log("回退到原有加载方法");
+        this.loadInitialGridListFallback();
+      }
+    },
+    
+    // 新增：回退方法（保留原有逻辑作为备用）
+    async loadInitialGridListFallback() {
+      console.log("使用回退方法加载数据");
+      
+      // 先获取图片总数
+      await this.getTotalCount();
+      
+      // 获取随机页码并加载数据
+      this.loadInitialGridList();
     },
     
     // 获取图片总数
@@ -88,7 +154,7 @@ Component({
       }
     },
     
-    // 首次加载时使用随机页码
+    // 首次加载时使用随机页码（保留原有逻辑作为备用）
     async loadInitialGridList() {
       if (this.data.isLoading) return;
       this.setData({ isLoading: true });
@@ -104,11 +170,15 @@ Component({
       await getModelsGridImages(randomPage, this.data.pageSize, this.data.randomSeed).then(ans => {
         this.setData({
           gridList: ans,
-          isLoading: false
+          isLoading: false,
+          isInitializing: false
         });
       }).catch(err => {
         console.error('获取图片列表失败:', err);
-        this.setData({ isLoading: false });
+        this.setData({ 
+          isLoading: false,
+          isInitializing: false
+        });
       });
     },
     
@@ -162,7 +232,7 @@ Component({
         console.error('获取图片列表失败:', err);
       });
     },
-    //通过数据模型表拉取GridList
+    //通过数据模型表拉取GridList（保留原有逻辑作为备用）
     async loadGridListFromModels() {
       if (this.data.isLoading) return; // 如果正在加载，直接返回
       this.setData({ isLoading: true }); // 设置加载状态
@@ -186,36 +256,17 @@ Component({
         this.setData({ isLoading: false }); // 重置加载状态
       });
     },
+    
+    // 修改：加载更多数据（优先使用完全随机方法）
     loadMore() {
-      this.loadGridListFromModels(); // 加载更多数据
+      // 优先使用完全随机加载
+      this.loadMoreCompleteRandom();
     },
+    
     loadMoreImages() {
       this.loadWaterfallImages();
     },
     
-    // refreshImages() {
-    //   // 生成新的随机种子
-    //   const randomSeed = Math.floor(Math.random() * 1000000) + 1;
-      
-    //   // 重置页面状态
-    //   this.setData({
-    //     randomSeed: randomSeed,
-    //     gridList: [], // 清空现有数据
-    //     isLoading: false
-    //   });
-      
-    //   // 显示加载提示
-    //   wx.showToast({
-    //     title: '刷新中...',
-    //     icon: 'loading',
-    //     duration: 1500
-    //   });
-      
-    //   console.log("重新生成随机种子:", randomSeed);
-      
-    //   // 重新获取随机页码并加载数据
-    //   this.loadInitialGridList();
-    // },
     viewImageDetail(event) {
       const imageUrl = event.currentTarget.dataset.url;
       wx.navigateTo({
@@ -248,6 +299,103 @@ Component({
         query: '',
         imageUrl: this.data.swiperImages[0] || app.globalData.shareInfo.imageUrl
       };
+    },
+
+    // 新增：完全随机加载更多图片
+    loadMoreCompleteRandom() {
+      if (this.data.isLoading) return;
+      
+      console.log("加载更多完全随机图片");
+      this.setData({ isLoading: true });
+      
+      try {
+        // 获取下一批随机未浏览图片
+        const moreImages = getRandomUnviewedImages(this.data.pageSize);
+        
+        if (moreImages.length === 0) {
+          console.log("没有更多图片了");
+          wx.showToast({
+            title: '没有更多图片了',
+            icon: 'none'
+          });
+          this.setData({ isLoading: false });
+          return;
+        }
+        
+        // 追加新图片到现有列表
+        const updatedGridList = this.data.gridList.concat(moreImages);
+        
+        this.setData({
+          gridList: updatedGridList,
+          isLoading: false,
+          dataStatus: this.data.showDebugInfo ? getImageDataStatus() : null
+        });
+        
+        console.log("加载更多完全随机图片成功, 新增数量:", moreImages.length);
+        
+      } catch (error) {
+        console.error("加载更多完全随机图片失败:", error);
+        
+        // 如果新方法失败，回退到原有方法
+        console.log("回退到原有加载更多方法");
+        this.loadGridListFromModels();
+      }
+    },
+    
+    // 新增：重新初始化数据（刷新功能）
+    async refreshData() {
+      console.log("刷新数据");
+      
+      // 重置所有数据
+      resetImageData();
+      
+      // 重新初始化
+      await this.initializeCompleteRandomData();
+      
+      wx.showToast({
+        title: '数据已刷新',
+        icon: 'success'
+      });
+    },
+    
+    // 新增：切换调试信息显示
+    toggleDebugInfo() {
+      const newShowDebugInfo = !this.data.showDebugInfo;
+      this.setData({ 
+        showDebugInfo: newShowDebugInfo,
+        dataStatus: newShowDebugInfo ? getImageDataStatus() : null
+      });
+      
+      wx.showToast({
+        title: newShowDebugInfo ? '调试信息已开启' : '调试信息已关闭',
+        icon: 'none'
+      });
+    },
+    
+    // 新增：获取当前数据状态（调试用）
+    getDataStatus() {
+      const status = getImageDataStatus();
+      console.log("当前数据状态:", status);
+      
+      wx.showModal({
+        title: '数据状态详情',
+        content: `预缓存: ${status.prefetchedCount}张
+全量数据: ${status.allDataCount}张
+已浏览: ${status.viewedCount}张
+剩余: ${status.remainingCount}张
+全量数据已加载: ${status.isAllDataLoaded ? '是' : '否'}`,
+        showCancel: true,
+        cancelText: '刷新数据',
+        confirmText: '确定',
+        success: (res) => {
+          if (res.cancel) {
+            // 用户点击了刷新数据
+            this.refreshData();
+          }
+        }
+      });
+      
+      return status;
     }
   },
   lifetimes: {

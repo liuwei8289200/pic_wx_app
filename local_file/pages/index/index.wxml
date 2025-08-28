@@ -1,7 +1,15 @@
 <!--pages/index/index.wxml-->
 <navigation-bar back="{{false}}" title="梦幻国王"></navigation-bar>
 <view class="top-bar">
-  <image class="logo" src="../../images/logo.png" mode="aspectFit" />
+  <image class="logo" src="../../images/logo.png" mode="aspectFit" bindlongpress="toggleDebugInfo" />
+</view>
+
+<!-- 新增：初始化状态提示 -->
+<view wx:if="{{isInitializing}}" class="loading-container">
+  <view class="loading-content">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在加载精彩内容...</text>
+  </view>
 </view>
 
 <scroll-view
@@ -10,6 +18,7 @@
  type="custom"
  show-scrollbar="{{false}}"
  bindscrolltolower="loadMore"
+ wx:if="{{!isInitializing}}"
 >
 <swiper class="swiper" autoplay="true" interval="3000" indicator-dots="true" indicator-active-color="#4682b4">
   <block wx:for="{{swiperImages}}" wx:key="*this">
@@ -21,6 +30,13 @@
     </swiper-item>
   </block>
 </swiper>
+
+  <!-- 新增：数据状态提示（调试模式下显示，长按logo可切换显示） -->
+  <view wx:if="{{showDebugInfo && dataStatus}}" class="data-status" bindtap="getDataStatus">
+    <text class="data-status-text">已浏览: {{dataStatus.viewedCount}} | 剩余: {{dataStatus.remainingCount}}</text>
+    <text class="data-status-text">全量已加载: {{dataStatus.isAllDataLoaded ? '是' : '否'}}</text>
+  </view>
+
   <grid-view type="masonry">
     <card
       wx:for="{{gridList}}"
@@ -30,4 +46,10 @@
       item="{{item}}"
     />
   </grid-view>
+  
+  <!-- 新增：加载更多状态提示 -->
+  <view wx:if="{{isLoading && !isInitializing}}" class="loading-more">
+    <view class="loading-spinner-small"></view>
+    <text class="loading-more-text">加载更多...</text>
+  </view>
 </scroll-view>

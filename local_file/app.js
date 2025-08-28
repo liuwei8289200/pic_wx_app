@@ -2,6 +2,7 @@
 const { init } = require("@cloudbase/wx-cloud-client-sdk");
 const client = init(wx.cloud);
 const models = client.models;
+
 App({
   onLaunch() {
     if (!wx.cloud) {
@@ -26,6 +27,18 @@ App({
     console.log('小程序显示，检查登录状态');
     // 每次进入小程序时都检查用户登录状态
     this.checkUserLoginStatus();
+  },
+  
+  // 新增：小程序隐藏时保存数据
+  onHide() {
+    console.log('小程序隐藏，保存浏览记录');
+    try {
+      // 动态导入保存函数，避免循环依赖
+      const { saveViewedImages } = require('./pages/index/utils');
+      saveViewedImages();
+    } catch (error) {
+      console.error('保存浏览记录失败:', error);
+    }
   },
   
   // 检查用户登录状态

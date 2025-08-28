@@ -146,7 +146,7 @@ export const getRandomPageNumber = (totalCount, pageSize) => {
 // 记录已使用过的页码
 const usedPageNumbers = new Set();
 
-// 获取未使用过的下一个页码
+// 获取未使用过的下一个页码（保留原有功能）
 export const getNextUnusedPageNumber = (totalCount, pageSize, currentPageNumber) => {
   if (!totalCount || !pageSize || totalCount <= 0 || pageSize <= 0) {
     return 1;
@@ -184,6 +184,305 @@ export const getNextUnusedPageNumber = (totalCount, pageSize, currentPageNumber)
   console.log("下一个未使用页码:", nextPageNumber);
   return nextPageNumber;
 }
+
+// 新增：已浏览图片的记录
+const viewedImageIds = new Set();
+
+// 新增：持久化存储的key
+const VIEWED_IMAGES_STORAGE_KEY = 'viewedImageIds';
+
+// 新增：从本地存储加载已浏览记录
+const loadViewedImagesFromStorage = () => {
+  try {
+    const stored = wx.getStorageSync(VIEWED_IMAGES_STORAGE_KEY);
+    if (stored && Array.isArray(stored)) {
+      stored.forEach(id => viewedImageIds.add(id));
+      console.log("从本地存储加载已浏览记录, 数量:", viewedImageIds.size);
+    }
+  } catch (error) {
+    console.error("加载已浏览记录失败:", error);
+  }
+};
+
+// 新增：保存已浏览记录到本地存储
+const saveViewedImagesToStorage = () => {
+  try {
+    const viewedArray = Array.from(viewedImageIds);
+    wx.setStorageSync(VIEWED_IMAGES_STORAGE_KEY, viewedArray);
+    console.log("保存已浏览记录到本地存储, 数量:", viewedArray.length);
+  } catch (error) {
+    console.error("保存已浏览记录失败:", error);
+  }
+};
+
+// 新增：预缓存图片数据
+let prefetchedImages = [];
+
+// 新增：全量图片数据
+let allImagesData = [];
+
+// 新增：数据加载状态
+let isAllDataLoaded = false;
+
+// 新增：初始化时加载已浏览记录
+(() => {
+  loadViewedImagesFromStorage();
+})();
+
+// 新增：获取预缓存图片数据（前1000张）
+export const getPrefetchImages = async (count = 100) => {
+  console.log("开始获取预缓存图片数据, count:", count);
+  
+  try {
+    const { data } = await models.media_image.list({
+      filter: {
+        where: {}
+      },
+      select: {
+        connect_image_liked_users: {
+          _id: true,
+        },
+        $master: true
+      },
+      pageSize: count,
+      pageNumber: 1,
+      getCount: true,
+    });
+    
+    console.log("预缓存数据获取成功, 数量:", data.records.length);
+    return formatImageData(data.records);
+  } catch (error) {
+    console.error("获取预缓存数据失败:", error);
+    return [];
+  }
+};
+
+// 新增：获取所有图片数据（后台异步加载）
+export const getAllImagesData = async () => {
+  console.log("开始获取所有图片数据");
+  
+  try {
+    // 首先获取总数
+    const totalCount = await getTotalImagesCount();
+    console.log("图片总数:", totalCount);
+    
+    const allImages = [];
+    const pageSize = 100; // 每次获取100张
+    const totalPages = Math.ceil(totalCount / pageSize);
+    
+    // 分批获取所有数据
+    for (let page = 1; page <= totalPages; page++) {
+      console.log(`正在获取第 ${page}/${totalPages} 页`);
+      
+      const { data } = await models.media_image.list({
+        filter: {
+          where: {}
+        },
+        select: {
+          connect_image_liked_users: {
+            _id: true,
+          },
+          $master: true
+        },
+        pageSize: pageSize,
+        pageNumber: page,
+        getCount: false,
+      });
+      
+      allImages.push(...data.records);
+    }
+    
+    console.log("所有图片数据获取完成, 总数:", allImages.length);
+    return formatImageData(allImages);
+  } catch (error) {
+    console.error("获取所有图片数据失败:", error);
+    return [];
+  }
+};
+
+// 新增：格式化图片数据的通用函数
+const formatImageData = (records) => {
+  const ans = [];
+  
+  records.forEach(item => {
+    let ratio = item.ratio;
+    if (ratio == "" || ratio == null || ratio == undefined) {
+      ratio = imageRatios["1:1"];
+    } else {
+      ratio = imageRatios[ratio];
+    }
+    
+    // src 根据指定格式拼接
+    const url = `https://6d69-mini-program-7gugok6cdb014aba-1258427370.tcb.qcloud.la/grid_images_online/${item.file_id}`;
+    
+    // 根据: 分割
+    const short_title = item.title.split('：')[0];
+    
+    ans.push({
+      id: ans.length,
+      docid: item._id,
+      ...ratio,
+      src: url,
+      like_users: item.connect_image_liked_users,
+      content: item.description,
+      title: item.title,
+      short_title: short_title,
+      foot_is_show: true,
+      // 新增字段，用于随机排序
+      randomOrder: Math.random()
+    });
+  });
+  
+  return ans;
+};
+
+// 新增：Fisher-Yates 洗牌算法，真正的随机打乱
+export const shuffleArray = (array) => {
+  const shuffled = [...array]; // 创建副本，避免修改原数组
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+// 新增：记录已浏览的图片
+export const markImageAsViewed = (imageId) => {
+  viewedImageIds.add(imageId);
+  console.log("标记图片为已浏览:", imageId, "已浏览总数:", viewedImageIds.size);
+  
+  // 每10次浏览保存一次到本地存储，避免频繁写入
+  if (viewedImageIds.size % 10 === 0) {
+    saveViewedImagesToStorage();
+  }
+};
+
+// 新增：获取随机图片列表（去除已浏览的）
+export const getRandomUnviewedImages = (count = 20) => {
+  console.log("获取随机未浏览图片, 请求数量:", count);
+  console.log("当前数据状态 - 预缓存:", prefetchedImages.length, "全量数据:", allImagesData.length, "全量数据已加载:", isAllDataLoaded);
+  
+  // 选择数据源：优先使用全量数据，如果未加载完成则使用预缓存数据
+  const dataSource = isAllDataLoaded && allImagesData.length > 0 ? allImagesData : prefetchedImages;
+  
+  if (dataSource.length === 0) {
+    console.warn("没有可用的图片数据");
+    return [];
+  }
+  
+  // 过滤掉已浏览的图片
+  const unviewedImages = dataSource.filter(image => !viewedImageIds.has(image.docid));
+  
+  console.log("未浏览图片数量:", unviewedImages.length, "已浏览数量:", viewedImageIds.size);
+  
+  if (unviewedImages.length === 0) {
+    console.log("所有图片都已浏览，重置浏览记录");
+    viewedImageIds.clear();
+    return getRandomUnviewedImages(count); // 递归调用
+  }
+  
+  // 随机打乱未浏览的图片
+  const shuffledImages = shuffleArray(unviewedImages);
+  
+  // 取前count张图片
+  const selectedImages = shuffledImages.slice(0, Math.min(count, shuffledImages.length));
+  
+  // 标记这些图片为已浏览
+  selectedImages.forEach(image => {
+    markImageAsViewed(image.docid);
+  });
+  
+  console.log("返回随机图片数量:", selectedImages.length);
+  return selectedImages;
+};
+
+// 新增：初始化图片数据（预缓存 + 后台加载全量数据）
+export const initializeImageData = async () => {
+  console.log("开始初始化图片数据");
+  
+  try {
+    // 1. 立即获取预缓存数据
+    console.log("步骤1: 获取预缓存数据");
+    prefetchedImages = await getPrefetchImages(1000);
+    console.log("预缓存数据加载完成, 数量:", prefetchedImages.length);
+    
+    // 2. 后台异步加载全量数据
+    console.log("步骤2: 开始后台加载全量数据");
+    setTimeout(async () => {
+      try {
+        allImagesData = await getAllImagesData();
+        
+        // 3. 计算差集：从全量数据中移除已浏览的预缓存图片
+        console.log("步骤3: 计算差集");
+        const viewedFromPrefetch = Array.from(viewedImageIds);
+        allImagesData = allImagesData.filter(image => !viewedFromPrefetch.includes(image.docid));
+        
+        // 随机打乱全量数据
+        allImagesData = shuffleArray(allImagesData);
+        
+        isAllDataLoaded = true;
+        console.log("全量数据加载完成并计算差集, 剩余数量:", allImagesData.length);
+        
+        // 触发事件通知组件数据已更新
+        wx.nextTick(() => {
+          wx.showToast({
+            title: '更多图片已加载',
+            icon: 'none',
+            duration: 1000
+          });
+        });
+        
+      } catch (error) {
+        console.error("后台加载全量数据失败:", error);
+      }
+    }, 100); // 延迟100ms开始后台加载，避免阻塞UI
+    
+    return prefetchedImages;
+  } catch (error) {
+    console.error("初始化图片数据失败:", error);
+    return [];
+  }
+};
+
+// 新增：重置所有数据（用于刷新）
+export const resetImageData = () => {
+  console.log("重置图片数据");
+  viewedImageIds.clear();
+  prefetchedImages = [];
+  allImagesData = [];
+  isAllDataLoaded = false;
+  
+  // 同时清除本地存储
+  try {
+    wx.removeStorageSync(VIEWED_IMAGES_STORAGE_KEY);
+    console.log("已清除本地存储的浏览记录");
+  } catch (error) {
+    console.error("清除本地存储失败:", error);
+  }
+};
+
+// 新增：手动保存浏览记录（用于应用退出前）
+export const saveViewedImages = () => {
+  saveViewedImagesToStorage();
+};
+
+// 新增：获取已浏览图片数量
+export const getViewedImagesCount = () => {
+  return viewedImageIds.size;
+};
+
+// 新增：获取数据状态信息
+export const getImageDataStatus = () => {
+  return {
+    prefetchedCount: prefetchedImages.length,
+    allDataCount: allImagesData.length,
+    viewedCount: viewedImageIds.size,
+    isAllDataLoaded: isAllDataLoaded,
+    remainingCount: isAllDataLoaded ? 
+      allImagesData.filter(img => !viewedImageIds.has(img.docid)).length :
+      prefetchedImages.filter(img => !viewedImageIds.has(img.docid)).length
+  };
+};
 
 export const getModelsGridImages = async (pageNumber, pageSize, randomSeed) => {
   // 固定调试使用

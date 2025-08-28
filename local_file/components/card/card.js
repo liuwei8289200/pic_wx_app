@@ -1,5 +1,7 @@
 const { shared } = wx.worklet
 import { on } from '../../utils/eventBus';
+// 新增：导入标记已浏览的函数
+import { markImageAsViewed } from '../../pages/index/utils';
 
 const FlightDirection = {
   PUSH: 0,
@@ -237,6 +239,16 @@ Component({
       const { index, url, content, ratio, title, short_title, docid } = e.currentTarget.dataset
       const item = this.data.item || {};
       const likeCount = item.like || 0;
+      
+      // 新增：标记图片为已浏览
+      if (docid) {
+        try {
+          markImageAsViewed(docid);
+          console.log("标记图片为已浏览:", docid);
+        } catch (error) {
+          console.error("标记图片为已浏览失败:", error);
+        }
+      }
       
       // 查询当前登录用户是否已点赞
       const openId = wx.getStorageSync('openId');

@@ -424,13 +424,13 @@ export const initializeImageData = async () => {
         console.log("全量数据加载完成并计算差集, 剩余数量:", allImagesData.length);
         
         // 触发事件通知组件数据已更新
-        wx.nextTick(() => {
-          wx.showToast({
-            title: '更多图片已加载',
-            icon: 'none',
-            duration: 1000
-          });
-        });
+        // wx.nextTick(() => {
+        //   wx.showToast({
+        //     title: '更多图片已加载',
+        //     icon: 'none',
+        //     duration: 1000
+        //   });
+        // });
         
       } catch (error) {
         console.error("后台加载全量数据失败:", error);

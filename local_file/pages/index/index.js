@@ -45,6 +45,10 @@ Component({
     isInitializing: true, // 是否正在初始化数据
     dataStatus: null, // 数据状态信息
     showDebugInfo: false, // 是否显示调试信息
+    
+    // 新增：轮播图尺寸
+    swiperWidth: 0,
+    swiperHeight: 0,
   },
 
   lifetimes: {
@@ -84,13 +88,24 @@ Component({
       });
       console.log("生成随机种子:", randomSeed);
       
+      // 计算轮播图尺寸（约占1/4屏幕高度，16:9比例）
+      const { screenWidth, screenHeight } = wx.getSystemInfoSync();
+      const targetHeight = screenHeight / 4; // 目标高度为屏幕的1/4
+      const swiperHeight = targetHeight;
+      const swiperWidth = screenWidth - 32; // 左右各留16rpx边距
+      
+      this.setData({
+        swiperWidth: swiperWidth,
+        swiperHeight: swiperHeight
+      });
+      console.log("轮播图尺寸 - 宽:", swiperWidth, "高:", swiperHeight);
+      
       this.loadSwiperImages();
       
       // 新的初始化逻辑：使用完全随机加载
       this.initializeCompleteRandomData();
       
       const { imageMargin, lineLimit } = this.data
-      const { screenWidth } = wx.getSystemInfoSync()
       this.setData({
         imageWidth: (screenWidth - imageMargin * 4) / lineLimit, // 图片宽度
       })
@@ -396,6 +411,101 @@ Component({
       });
       
       return status;
+    },
+    
+    // 新增：保存轮播图图片
+    saveSwiperImage(e) {
+      const { url } = e.currentTarget.dataset;
+      
+      if (!url) {
+        wx.showToast({
+          title: '图片地址无效',
+          icon: 'none'
+        });
+        return;
+      }
+      
+      wx.showModal({
+        title: '提示',
+        content: '是否保存图片到相册？',
+        success: (res) => {
+          if (res.confirm) {
+            wx.getSetting({
+              success: (res) => {
+                if (!res.authSetting['scope.writePhotosAlbum']) {
+                  wx.authorize({
+                    scope: 'scope.writePhotosAlbum',
+                    success: () => {
+                      this.doSaveSwiperImage(url);
+                    },
+                    fail: () => {
+                      wx.showModal({
+                        title: '提示',
+                        content: '需要您授权保存图片到相册',
+                        success: (res) => {
+                          if (res.confirm) {
+                            wx.openSetting();
+                          }
+                        }
+                      });
+                    }
+                  });
+                } else {
+                  this.doSaveSwiperImage(url);
+                }
+              }
+            });
+          }
+        }
+      });
+    },
+
+    // 执行保存轮播图图片
+    doSaveSwiperImage(url) {
+      wx.showLoading({
+        title: '保存中...',
+        mask: true
+      });
+      
+      wx.downloadFile({
+        url: url,
+        success: (res) => {
+          if (res.statusCode === 200) {
+            wx.saveImageToPhotosAlbum({
+              filePath: res.tempFilePath,
+              success: () => {
+                wx.hideLoading();
+                wx.showToast({
+                  title: '保存成功',
+                  icon: 'success'
+                });
+              },
+              fail: (err) => {
+                wx.hideLoading();
+                console.error('保存图片失败:', err);
+                wx.showToast({
+                  title: '保存失败',
+                  icon: 'error'
+                });
+              }
+            });
+          } else {
+            wx.hideLoading();
+            wx.showToast({
+              title: '下载失败',
+              icon: 'error'
+            });
+          }
+        },
+        fail: (err) => {
+          wx.hideLoading();
+          console.error('下载图片失败:', err);
+          wx.showToast({
+            title: '下载失败',
+            icon: 'error'
+          });
+        }
+      });
     }
   },
   lifetimes: {

@@ -4,47 +4,70 @@ page {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  background-color: #f4f4f4;
 }
 
 scroll-view {
   background-color: #f4f4f4;
 }
 
-.swiper {
-  width: 100%;
-  height: 30vh;
-  overflow: hidden;
+/* ========== 轮播图区域样式 ========== */
+.swiper-wrapper {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 16rpx;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.slide-container {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+.logo {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+  margin-bottom: 12rpx;
+}
+
+/* 轮播图容器 - 严格1:1比例 */
+.swiper {
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 6rpx 24rpx rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+}
+
+.swiper-item-container {
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+/* 轮播图图片 - 16:9比例，覆盖填充模式 */
+.swiper-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+/* 长按视觉反馈 */
+.swiper-image:active {
+  transform: scale(0.95);
+}
+
+/* ========== 瀑布流区域样式 ========== */
+.waterfall-wrapper {
+  background-color: #f4f4f4;
+  min-height: 100vh;
+  padding-top: 20rpx;
 }
 
 view, scroll-view, page, image {
   box-sizing: border-box;
-}
-
-.top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 10px;
-  /* background-color: #f0f8ff; */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.logo.tmp {
-  font-size: 48rpx;  /* 调整图标大小 */
-  color: #333;  /* 设置图标颜色 */
-}
-.logo {
-  width: 42px;
-  height: 42px;
 }
 
 .safe-area-inset-bottom {

@@ -318,6 +318,10 @@ const formatImageData = (records) => {
     // 根据: 分割
     const short_title = item.title.split('：')[0];
     
+    // 为相同尺寸的图片添加随机高度变化系数
+    // 随机系数范围：0.85 - 1.15，让图片高度有±15%的变化
+    const heightVariation = 0.85 + Math.random() * 0.3;
+    
     ans.push({
       id: ans.length,
       docid: item._id,
@@ -329,7 +333,9 @@ const formatImageData = (records) => {
       short_title: short_title,
       foot_is_show: true,
       // 新增字段，用于随机排序
-      randomOrder: Math.random()
+      randomOrder: Math.random(),
+      // 新增：随机高度变化系数，让瀑布流更错落有致
+      heightVariation: heightVariation
     });
   });
   
@@ -533,10 +539,14 @@ export const getModelsGridImages = async (pageNumber, pageSize, randomSeed) => {
       ratio = imageRatios[ratio]
     }
     // src 根据指定格式拼接
-    const url = `https://6d69-mini-program-7gugok6cdb014aba-1258427370.tcb.qcloud.la/grid_images_online/${item.file_id}`;
+    const url = `https://6d69-mini-program-7ugugok6cdb014aba-1258427370.tcb.qcloud.la/grid_images_online/${item.file_id}`;
     
     //根据: 分割
     const short_title = item.title.split('：')[0];
+    
+    // 为相同尺寸的图片添加随机高度变化系数
+    const heightVariation = 0.85 + Math.random() * 0.3;
+    
     ans.push({
       // id 是自增序号
       id: ans.length,
@@ -548,6 +558,8 @@ export const getModelsGridImages = async (pageNumber, pageSize, randomSeed) => {
       title: item.title,
       short_title: short_title,
       foot_is_show:true,
+      // 新增：随机高度变化系数
+      heightVariation: heightVariation
     });
     console.log("ans", ans);
   });
@@ -597,6 +609,10 @@ export const generateGridListNew = (childCount, columns) => {
           
           //根据: 分割
           const short_title = item.title.split('：')[0];
+          
+          // 为相同尺寸的图片添加随机高度变化系数
+          const heightVariation = 0.85 + Math.random() * 0.3;
+          
           ans.push({
             // id 是自增序号
             id: ans.length,
@@ -607,6 +623,8 @@ export const generateGridListNew = (childCount, columns) => {
             content: item.desc,
             title: item.title,
             short_title: short_title,
+            // 新增：随机高度变化系数
+            heightVariation: heightVariation
           });
           console.log("ans", ans);
         });

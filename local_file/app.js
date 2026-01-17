@@ -44,6 +44,7 @@ App({
   // 检查用户登录状态
   async checkUserLoginStatus() {
     try {
+      console.log("开始调用 getOpenid 云函数");
       const respone = await wx.cloud.callFunction({
         name: 'getOpenid'
       });
@@ -74,7 +75,15 @@ App({
         console.log("Login status:", status);
       }
     } catch (err) {
-      console.error("检查登录状态失败:", err);
+      console.error("检查登录状态失败 - 详细错误:", err);
+      console.error("错误码:", err.errCode);
+      console.error("错误信息:", err.errMsg);
+      
+      // 如果是云函数不存在或500错误，给出友好提示
+      if (err.errCode === -1 || err.errMsg.includes('500')) {
+        console.warn("云函数调用失败，请检查云函数是否已部署");
+      }
+      
       // 登录失败时，确保清除登录状态
       wx.setStorageSync('loginStatus', false);
       wx.removeStorageSync('userInfo');

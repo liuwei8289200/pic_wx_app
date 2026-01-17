@@ -7,7 +7,7 @@
       <view class="nickname">{{userInfo.user_name}}</view>
     </view>
     <view class="user-info-placeholder" wx:else bindtap="goToUserProfile">
-      <image class="avatar" src="/images/default_avatar.png" mode="aspectFill"></image>
+      <view class="avatar default-avatar">👤</view>
       <view class="login-text">点击登录</view>
     </view>
   </view>
@@ -38,7 +38,7 @@
         />
       </grid-view>
       <view class="empty-state" wx:else>
-        <image src="/images/empty.png" mode="aspectFit" class="empty-icon"></image>
+        <view class="empty-icon">📷</view>
         <view class="empty-text">您还没有赞过图片</view>
       </view>
     </scroll-view>
@@ -48,7 +48,7 @@
     <view class="settings-list">
       <view class="settings-item" bindtap="goToUserProfile">
         <text>修改个人信息</text>
-        <image src="/images/arrow_right.png" class="arrow-icon"></image>
+        <view class="arrow-icon">›</view>
       </view>
       <view class="settings-item" wx:if="{{hasUserInfo}}" bindtap="handleLogout">
         <text>退出登录</text>

@@ -92,6 +92,14 @@ view, scroll-view, page, image {
   background-color: #f0f0f0;
 }
 
+.default-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80rpx;
+  color: #999;
+}
+
 .nickname {
   font-size: 32rpx;
   font-weight: 500;
@@ -159,8 +167,9 @@ view, scroll-view, page, image {
 }
 
 .arrow-icon {
-  width: 40rpx;
-  height: 40rpx;
+  font-size: 48rpx;
+  color: #999;
+  line-height: 1;
 }
 
 .empty-state {
@@ -172,9 +181,9 @@ view, scroll-view, page, image {
 }
 
 .empty-icon {
-  width: 200rpx;
-  height: 200rpx;
+  font-size: 120rpx;
   margin-bottom: 20rpx;
+  opacity: 0.3;
 }
 
 .empty-text {

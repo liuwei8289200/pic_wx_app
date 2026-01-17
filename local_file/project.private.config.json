@@ -4,27 +4,21 @@
   "setting": {
     "compileHotReLoad": true,
     "urlCheck": false,
-    "skylineRenderEnable": true
+    "skylineRenderEnable": true,
+    "coverView": true,
+    "lazyloadPlaceholderEnable": false,
+    "preloadBackgroundData": false,
+    "autoAudits": false,
+    "useApiHook": true,
+    "useApiHostProcess": true,
+    "showShadowRootInWxmlPanel": true,
+    "useStaticServer": false,
+    "useLanDebug": false,
+    "showES6CompileOption": false,
+    "checkInvalidKey": true,
+    "ignoreDevUnusedFiles": true,
+    "bigPackageSizeSupport": false
   },
-  "condition": {
-    "miniprogram": {
-      "list": [
-        {
-          "name": "",
-          "pathName": "detail/detail",
-          "query": "index=1&url=https%3A%2F%2Fpicsum.photos%2F300%2F400%3Frandom%3D1&content=Hayya Hayya！我来小红书啦&ratio=0.75",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "",
-          "pathName": "list/list",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        }
-      ]
-    }
-  },
-  "libVersion": "latest"
+  "condition": {},
+  "libVersion": "3.8.10"
 }

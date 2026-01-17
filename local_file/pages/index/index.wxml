@@ -17,16 +17,20 @@
  bindscrolltolower="loadMore"
  wx:if="{{!isInitializing}}"
 >
+  <!-- Logo 区域 -->
+  <view class="logo-wrapper">
+    <image class="logo" src="../../images/logo.png" mode="aspectFit" bindlongpress="toggleDebugInfo" />
+  </view>
+
   <!-- 优化后的轮播图区域 -->
   <view class="swiper-wrapper">
-    <image class="logo" src="../../images/logo.png" mode="aspectFit" bindlongpress="toggleDebugInfo" />
-    
     <swiper 
       class="swiper" 
       autoplay="true" 
-      interval="3000" 
+      interval="3500" 
       indicator-dots="true" 
-      indicator-active-color="#4682b4"
+      indicator-color="rgba(255, 255, 255, 0.4)"
+      indicator-active-color="#ffffff"
       circular="true"
       style="width: {{swiperWidth}}px; height: {{swiperHeight}}px;"
     >

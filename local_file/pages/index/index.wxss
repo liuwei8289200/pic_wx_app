@@ -4,37 +4,53 @@ page {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #f4f4f4;
+  background-color: #fafafa;
 }
 
 scroll-view {
-  background-color: #f4f4f4;
+  background: transparent !important;
+}
+
+/* ========== Logo 区域样式 ========== */
+.logo-wrapper {
+  background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+  padding: 24rpx 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4rpx 16rpx rgba(94, 114, 228, 0.2);
+}
+
+.logo {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 50%;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.25);
+  background-color: #ffffff;
+  padding: 6rpx;
+  transition: transform 0.3s ease;
+}
+
+.logo:active {
+  transform: scale(0.95);
 }
 
 /* ========== 轮播图区域样式 ========== */
 .swiper-wrapper {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 16rpx;
+  background: linear-gradient(180deg, #6c7ff2 0%, #7b68ee 100%);
+  padding: 24rpx 16rpx 32rpx 16rpx;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.logo {
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 50%;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
-  margin-bottom: 12rpx;
-}
-
-/* 轮播图容器 - 严格1:1比例 */
+/* 轮播图容器 - 严格 16:9 比例 */
 .swiper {
-  border-radius: 16rpx;
+  border-radius: 20rpx;
   overflow: hidden;
-  box-shadow: 0 6rpx 24rpx rgba(0, 0, 0, 0.2);
-  background-color: #fff;
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.3);
+  background-color: #000;
 }
 
 .swiper-item-container {
@@ -43,7 +59,7 @@ scroll-view {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f5f5f5;
+  background-color: #1a1a1a;
 }
 
 /* 轮播图图片 - 16:9比例，覆盖填充模式 */
@@ -61,9 +77,22 @@ scroll-view {
 
 /* ========== 瀑布流区域样式 ========== */
 .waterfall-wrapper {
-  background-color: #f4f4f4;
+  background: linear-gradient(to bottom, #f0f2ff 0%, #fafafa 200rpx);
   min-height: 100vh;
-  padding-top: 20rpx;
+  padding-top: 32rpx;
+  position: relative;
+}
+
+/* 瀑布流顶部装饰波浪 */
+.waterfall-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60rpx;
+  background: linear-gradient(to bottom, rgba(123, 104, 238, 0.15) 0%, transparent 100%);
+  pointer-events: none;
 }
 
 view, scroll-view, page, image {

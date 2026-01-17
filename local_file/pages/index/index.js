@@ -88,17 +88,17 @@ Component({
       });
       console.log("生成随机种子:", randomSeed);
       
-      // 计算轮播图尺寸（约占1/4屏幕高度，16:9比例）
-      const { screenWidth, screenHeight } = wx.getSystemInfoSync();
-      const targetHeight = screenHeight / 4; // 目标高度为屏幕的1/4
-      const swiperHeight = targetHeight;
-      const swiperWidth = screenWidth - 32; // 左右各留16rpx边距
+      // 计算轮播图尺寸（严格 16:9 比例）
+      const { screenWidth } = wx.getSystemInfoSync();
+      const swiperPadding = 32; // 左右各16rpx边距
+      const swiperWidth = screenWidth - swiperPadding;
+      const swiperHeight = (swiperWidth * 9) / 16; // 16:9 比例
       
       this.setData({
         swiperWidth: swiperWidth,
         swiperHeight: swiperHeight
       });
-      console.log("轮播图尺寸 - 宽:", swiperWidth, "高:", swiperHeight);
+      console.log("轮播图尺寸（16:9）- 宽:", swiperWidth, "高:", swiperHeight);
       
       this.loadSwiperImages();
       

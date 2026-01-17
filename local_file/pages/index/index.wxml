@@ -51,7 +51,6 @@
   </view>
 
   <!-- 瀑布流区域 -->
-  <view class="waterfall-wrapper" style="padding: {{padding}}px;">
     <!-- 新增：数据状态提示（调试模式下显示，长按logo可切换显示） -->
     <view wx:if="{{showDebugInfo && dataStatus}}" class="data-status" bindtap="getDataStatus">
       <text class="data-status-text">已浏览: {{dataStatus.viewedCount}} | 剩余: {{dataStatus.remainingCount}}</text>
@@ -73,5 +72,4 @@
       <view class="loading-spinner-small"></view>
       <text class="loading-more-text">加载更多...</text>
     </view>
-  </view>
 </scroll-view>

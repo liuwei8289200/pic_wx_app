@@ -13,12 +13,12 @@ scroll-view {
 
 /* ========== Logo 区域样式 ========== */
 .logo-wrapper {
-  background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+  background: linear-gradient(135deg, #c8cef5 0%, #d5d0f0 100%);
   padding: 24rpx 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4rpx 16rpx rgba(94, 114, 228, 0.2);
+  box-shadow: 0 2rpx 12rpx rgba(180, 180, 220, 0.18);
 }
 
 .logo {
@@ -37,7 +37,7 @@ scroll-view {
 
 /* ========== 轮播图区域样式 ========== */
 .swiper-wrapper {
-  background: linear-gradient(180deg, #6c7ff2 0%, #7b68ee 100%);
+  background: linear-gradient(180deg, #d3d9f3 0%, #ddd9f0 100%);
   padding: 24rpx 16rpx 32rpx 16rpx;
   position: relative;
   display: flex;
@@ -91,7 +91,7 @@ scroll-view {
   left: 0;
   right: 0;
   height: 60rpx;
-  background: linear-gradient(to bottom, rgba(123, 104, 238, 0.15) 0%, transparent 100%);
+  background: linear-gradient(to bottom, rgba(221, 217, 240, 0.6) 0%, transparent 100%);
   pointer-events: none;
 }
 

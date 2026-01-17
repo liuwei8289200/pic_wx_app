@@ -229,8 +229,8 @@ let isAllDataLoaded = false;
   loadViewedImagesFromStorage();
 })();
 
-// 新增：获取预缓存图片数据（前1000张）
-export const getPrefetchImages = async (count = 100) => {
+// 新增：获取预缓存图片数据（优化：只查询必需字段）
+export const getPrefetchImages = async (count = 500) => {
   console.log("开始获取预缓存图片数据, count:", count);
   
   try {
@@ -239,10 +239,14 @@ export const getPrefetchImages = async (count = 100) => {
         where: {}
       },
       select: {
+        _id: true,
+        file_id: true,
+        title: true,
+        description: true,
+        ratio: true,
         connect_image_liked_users: {
           _id: true,
-        },
-        $master: true
+        }
       },
       pageSize: count,
       pageNumber: 1,
@@ -257,43 +261,96 @@ export const getPrefetchImages = async (count = 100) => {
   }
 };
 
-// 新增：获取所有图片数据（后台异步加载）
-export const getAllImagesData = async () => {
-  console.log("开始获取所有图片数据");
+// 新增：并行加载指定范围的图片数据（优化版本）
+export const loadImagesBatch = async (startPage, endPage, pageSize = 100) => {
+  console.log(`并行加载图片数据: 从第${startPage}页到第${endPage}页`);
+  
+  try {
+    const promises = [];
+    
+    // 创建并行请求数组
+    for (let page = startPage; page <= endPage; page++) {
+      const promise = models.media_image.list({
+        filter: {
+          where: {}
+        },
+        select: {
+          _id: true,
+          file_id: true,
+          title: true,
+          description: true,
+          ratio: true,
+          connect_image_liked_users: {
+            _id: true,
+          }
+        },
+        pageSize: pageSize,
+        pageNumber: page,
+        getCount: false,
+      });
+      promises.push(promise);
+    }
+    
+    // 并行执行所有请求
+    const results = await Promise.all(promises);
+    
+    // 合并所有结果
+    const allRecords = [];
+    results.forEach(result => {
+      if (result && result.data && result.data.records) {
+        allRecords.push(...result.data.records);
+      }
+    });
+    
+    console.log(`并行加载完成, 获取到 ${allRecords.length} 张图片`);
+    
+    // ✅ 格式化后立即打乱，保证每批数据都是随机的
+    const formattedData = formatImageData(allRecords);
+    return shuffleArray(formattedData);
+  } catch (error) {
+    console.error("并行加载图片数据失败:", error);
+    return [];
+  }
+};
+
+// 新增：获取所有图片数据（优化版：并行分批加载）
+export const getAllImagesData = async (prefetchCount = 500) => {
+  console.log("开始获取所有图片数据（并行加载优化）");
   
   try {
     // 首先获取总数
     const totalCount = await getTotalImagesCount();
     console.log("图片总数:", totalCount);
     
-    const allImages = [];
-    const pageSize = 100; // 每次获取100张
+    const pageSize = 100;
     const totalPages = Math.ceil(totalCount / pageSize);
+    const prefetchPages = Math.ceil(prefetchCount / pageSize);
     
-    // 分批获取所有数据
-    for (let page = 1; page <= totalPages; page++) {
-      console.log(`正在获取第 ${page}/${totalPages} 页`);
+    // 如果预缓存已经覆盖全部数据，直接返回
+    if (prefetchPages >= totalPages) {
+      console.log("预缓存已覆盖全部数据，无需额外加载");
+      return [];
+    }
+    
+    const allImages = [];
+    const concurrency = 5; // 并发数：同时发起5个请求
+    
+    // 从预缓存之后开始加载
+    for (let startPage = prefetchPages + 1; startPage <= totalPages; startPage += concurrency) {
+      const endPage = Math.min(startPage + concurrency - 1, totalPages);
+      console.log(`并行加载第 ${startPage}-${endPage} 页（共${totalPages}页）`);
       
-      const { data } = await models.media_image.list({
-        filter: {
-          where: {}
-        },
-        select: {
-          connect_image_liked_users: {
-            _id: true,
-          },
-          $master: true
-        },
-        pageSize: pageSize,
-        pageNumber: page,
-        getCount: false,
-      });
+      const batchImages = await loadImagesBatch(startPage, endPage, pageSize);
+      allImages.push(...batchImages);
       
-      allImages.push(...data.records);
+      // 每批之间稍微延迟，避免服务器压力过大
+      if (endPage < totalPages) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
     }
     
     console.log("所有图片数据获取完成, 总数:", allImages.length);
-    return formatImageData(allImages);
+    return allImages;
   } catch (error) {
     console.error("获取所有图片数据失败:", error);
     return [];
@@ -363,7 +420,7 @@ export const markImageAsViewed = (imageId) => {
   }
 };
 
-// 新增：获取随机图片列表（去除已浏览的）
+// 新增：获取随机图片列表（优化版：支持增量加载）
 export const getRandomUnviewedImages = (count = 20) => {
   console.log("获取随机未浏览图片, 请求数量:", count);
   console.log("当前数据状态 - 预缓存:", prefetchedImages.length, "全量数据:", allImagesData.length, "全量数据已加载:", isAllDataLoaded);
@@ -381,9 +438,15 @@ export const getRandomUnviewedImages = (count = 20) => {
   
   console.log("未浏览图片数量:", unviewedImages.length, "已浏览数量:", viewedImageIds.size);
   
+  // 优化：当未浏览图片不足500张且全量数据已加载时，提示用户
+  if (unviewedImages.length < 500 && isAllDataLoaded && unviewedImages.length > 0) {
+    console.log("提示：剩余未浏览图片较少");
+  }
+  
   if (unviewedImages.length === 0) {
     console.log("所有图片都已浏览，重置浏览记录");
     viewedImageIds.clear();
+    saveViewedImagesToStorage();
     return getRandomUnviewedImages(count); // 递归调用
   }
   
@@ -402,41 +465,44 @@ export const getRandomUnviewedImages = (count = 20) => {
   return selectedImages;
 };
 
-// 新增：初始化图片数据（预缓存 + 后台加载全量数据）
+// 新增：初始化图片数据（优化版：预缓存 + 并行后台加载）
 export const initializeImageData = async () => {
-  console.log("开始初始化图片数据");
+  console.log("开始初始化图片数据（优化版）");
   
   try {
-    // 1. 立即获取预缓存数据
+    // 1. 立即获取预缓存数据（500张，覆盖当前全部或大部分数据）
     console.log("步骤1: 获取预缓存数据");
-    prefetchedImages = await getPrefetchImages(1000);
-    console.log("预缓存数据加载完成, 数量:", prefetchedImages.length);
+    prefetchedImages = await getPrefetchImages(500);
     
-    // 2. 后台异步加载全量数据
-    console.log("步骤2: 开始后台加载全量数据");
+    // ✅ 关键修复：立即打乱预缓存数据，保证随机性
+    prefetchedImages = shuffleArray(prefetchedImages);
+    console.log("预缓存数据加载并打乱完成, 数量:", prefetchedImages.length);
+    
+    // 2. 后台异步并行加载剩余数据
+    console.log("步骤2: 开始后台并行加载剩余数据");
     setTimeout(async () => {
       try {
-        allImagesData = await getAllImagesData();
+        const additionalImages = await getAllImagesData(500);
         
-        // 3. 计算差集：从全量数据中移除已浏览的预缓存图片
-        console.log("步骤3: 计算差集");
-        const viewedFromPrefetch = Array.from(viewedImageIds);
-        allImagesData = allImagesData.filter(image => !viewedFromPrefetch.includes(image.docid));
+        // 3. 合并数据
+        console.log("步骤3: 合并数据");
         
-        // 随机打乱全量数据
-        allImagesData = shuffleArray(allImagesData);
+        // ✅ 将新加载的图片添加到全量数据中（已经在getAllImagesData中打乱）
+        allImagesData = [...additionalImages];
         
         isAllDataLoaded = true;
-        console.log("全量数据加载完成并计算差集, 剩余数量:", allImagesData.length);
+        console.log("全量数据加载完成, 总数量:", allImagesData.length);
         
         // 触发事件通知组件数据已更新
-        // wx.nextTick(() => {
-        //   wx.showToast({
-        //     title: '更多图片已加载',
-        //     icon: 'none',
-        //     duration: 1000
-        //   });
-        // });
+        if (allImagesData.length > 0) {
+          wx.nextTick(() => {
+            wx.showToast({
+              title: `已加载${allImagesData.length}张新图片`,
+              icon: 'none',
+              duration: 1500
+            });
+          });
+        }
         
       } catch (error) {
         console.error("后台加载全量数据失败:", error);
@@ -504,10 +570,14 @@ export const getModelsGridImages = async (pageNumber, pageSize, randomSeed) => {
       where: {}
     },
     select: {
+      _id: true,
+      file_id: true,
+      title: true,
+      description: true,
+      ratio: true,
       connect_image_liked_users:{
         _id:true,
-      },
-      $master:true
+      }
     },
     pageSize: pageSize, // 分页大小，建议指定，如需设置为其它值，需要和 pageNumber 配合使用，两者同时指定才会生效
     pageNumber: pageNumber, // 第几页
